@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GearView">
+        <attr format="color" name="mainColor"/>
+        <attr format="color" name="innerColor"/>
+        <attr format="float" name="rotateAngle"/>
+        <attr format="dimension" name="mainDiameter"/>
+        <attr format="dimension" name="secondDiameter"/>
+        <attr format="dimension" name="innerDiameter"/>
+        <attr format="dimension" name="teethWidth"/>
+        <attr format="boolean" name="enableCutCenter"/>
+    </declare-styleable>
+
+    <declare-styleable name="CutOutLayout">
+        <attr format="color" name="cutLayoutColor"/>
+        <attr format="dimension" name="cutRadius"/>
+    </declare-styleable>
+
+    <declare-styleable name="GearLoadingLayout">
+        <attr format="color" name="firstGearColor"/>
+        <attr format="color" name="secondGearColor"/>
+        <attr format="color" name="thirdGearColor"/>
+        <attr format="color" name="firstInnerGearColor"/>
+        <attr format="color" name="secondInnerGearColor"/>
+        <attr format="color" name="thirdInnerGearColor"/>
+        <attr format="color" name="loadingLayoutCutColor"/>
+        <attr format="color" name="loadingLayoutTextColor"/>
+        <attr format="dimension" name="loadingLayoutCutRadius"/>
+        <attr format="float" name="loadingLayoutCutAlpha"/>
+        <attr format="boolean" name="cutLayoutVisibility"/>
+        <attr format="boolean" name="loadingTextVisibility"/>
+        <attr format="boolean" name="firstGearCuttedCenter"/>
+        <attr format="boolean" name="secondGearCuttedCenter"/>
+        <attr format="boolean" name="thirdGearCuttedCenter"/>
+        <attr format="string" name="loadingText"/>
+    </declare-styleable>
+</resources>

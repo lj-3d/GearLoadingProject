@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:gear="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/main_wrapper"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:gravity="center_vertical">
+
+    <FrameLayout
+        android:id="@+id/main_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+    <FrameLayout
+        android:id="@+id/gear_layout_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/two_gear_layout_wrapper_height">
+
+
+        <FrameLayout
+            android:id="@+id/gear_layout_inner_wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <RelativeLayout
+            android:id="@+id/gears_wrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top"
+            android:padding="@dimen/padding_5">
+
+            <lj_3d.gearloadinglayout.gearViews.GearView
+                android:id="@+id/gear_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                gear:enableCutCenter="true"
+                gear:innerDiameter="@dimen/two_gear_first_inner_diameter"
+                gear:mainDiameter="@dimen/two_gear_first_main_diameter"
+                gear:secondDiameter="@dimen/two_gear_first_second_diameter"
+                gear:teethWidth="@dimen/two_gear_first_teeth_width"/>
+
+            <lj_3d.gearloadinglayout.gearViews.GearView
+                android:id="@+id/gear_view_second"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/two_gear_second_margin_left"
+                android:layout_marginTop="@dimen/two_gear_second_margin_top"
+                gear:enableCutCenter="true"
+                gear:innerDiameter="@dimen/two_gear_second_inner_diameter"
+                gear:mainDiameter="@dimen/two_gear_second_main_diameter"
+                gear:secondDiameter="@dimen/two_gear_second_second_diameter"
+                gear:teethWidth="@dimen/two_gear_second_teeth_width"/>
+
+
+        </RelativeLayout>
+
+        <lj_3d.gearloadinglayout.gearViews.CutOutLayout
+            android:id="@+id/cut_out_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.8"
+            android:visibility="visible"
+            gear:cutLayoutColor="@android:color/white"
+            gear:cutRadius="@dimen/cut_layout_diameter"/>
+
+    </FrameLayout>
+
+</RelativeLayout>

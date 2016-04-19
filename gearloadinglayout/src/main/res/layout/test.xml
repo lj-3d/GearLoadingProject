@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:gear="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/colorPrimary"
+              android:orientation="vertical">
+
+    <!--<lj_3d.gearloadinglayout.gearViews.GearView-->
+    <!--android:id="@+id/gear_view_second"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignLeft="@+id/gear_view"-->
+    <!--android:layout_alignStart="@+id/gear_view"-->
+    <!--android:layout_below="@+id/gear_view"-->
+    <!--android:layout_marginLeft="54dp"-->
+    <!--gear:innerColor="@android:color/white"-->
+    <!--gear:innerDiameter="10dp"-->
+    <!--gear:mainColor="#97DDFF"-->
+    <!--gear:cutCenter="true"-->
+    <!--gear:mainDiameter="80dp"-->
+    <!--gear:secondDiameter="30dp"-->
+    <!--gear:teethWidth="10dp"/>-->
+
+    <!--<lj_3d.gearloadinglayout.gearViews.GearView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--gear:enableCutCenter="true"-->
+        <!--gear:innerColor="@android:color/background_dark"-->
+        <!--gear:innerDiameter="20dp"-->
+        <!--gear:mainColor="#343849"-->
+        <!--gear:mainDiameter="100dp"-->
+        <!--gear:secondDiameter="80dp"-->
+        <!--gear:teethWidth="10dp"/>-->
+
+    <!--<lj_3d.gearloadinglayout.gearViews.GearCircleDrawable-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="match_parent"/>-->
+    <lj_3d.gearloadinglayout.gearViews.ThreeGearsLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

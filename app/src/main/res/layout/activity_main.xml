@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="lj_3d.gearloadinglayout.MainActivity">
+
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/girl"/>
+
+    <RadioGroup
+        android:id="@+id/rg_types"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/cb_one_gear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="one"/>
+
+        <RadioButton
+            android:id="@+id/cb_two_gears"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="two"/>
+
+        <RadioButton
+            android:id="@+id/cb_three_gears"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="three"/>
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btn_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rg_types"
+        android:layout_centerInParent="true"
+        android:text="top"/>
+
+    <Button
+        android:id="@+id/btn_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:text="bottom"/>
+
+    <Button
+        android:id="@+id/btn_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerInParent="true"
+        android:text="left"/>
+
+    <Button
+        android:id="@+id/btn_rigth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"
+        android:text="right"/>
+
+
+    <Button
+        android:id="@+id/btn_center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="center"/>
+
+</RelativeLayout>

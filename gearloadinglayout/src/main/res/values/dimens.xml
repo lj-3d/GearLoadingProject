@@ -1,0 +1,45 @@
+<resources>
+    <dimen name="shape_stroke_corner_width">1dp</dimen>
+    <dimen name="padding_5">5dp</dimen>
+    <dimen name="padding_10">10dp</dimen>
+
+    <dimen name="three_gear_layout_wrapper_height">120dp</dimen>
+    <dimen name="two_gear_layout_wrapper_height">100dp</dimen>
+    <dimen name="one_gear_layout_wrapper_height">90dp</dimen>
+
+    <dimen name="cut_layout_diameter">40dp</dimen>
+
+    <dimen name="three_gear_first_inner_diameter">9dp</dimen>
+    <dimen name="three_gear_first_main_diameter">60dp</dimen>
+    <dimen name="three_gear_first_second_diameter">45dp</dimen>
+    <dimen name="three_gear_first_gear_width">7dp</dimen>
+    <dimen name="three_gear_second_margin_left">35dp</dimen>
+    <dimen name="three_gear_second_margin_top">-15dp</dimen>
+    <dimen name="three_gear_second_inner_diameter">6dp</dimen>
+    <dimen name="three_gear_second_main_diameter">55dp</dimen>
+    <dimen name="three_gear_second_second_diameter">45dp</dimen>
+    <dimen name="three_gear_second_teeth_width">6dp</dimen>
+    <dimen name="three_gear_third_margin_left">-24dp</dimen>
+    <dimen name="three_gear_third_margin_top">-60dp</dimen>
+    <dimen name="three_gear_third_inner_diameter">14dp</dimen>
+    <dimen name="three_gear_third_main_diameter">60dp</dimen>
+    <dimen name="three_gear_third_second_diameter">50dp</dimen>
+    <dimen name="three_gear_third_teeth_width">8dp</dimen>
+
+    <dimen name="two_gear_first_inner_diameter">10dp</dimen>
+    <dimen name="two_gear_first_main_diameter">70dp</dimen>
+    <dimen name="two_gear_first_second_diameter">55dp</dimen>
+    <dimen name="two_gear_first_teeth_width">9dp</dimen>
+    <dimen name="two_gear_second_margin_left">63dp</dimen>
+    <dimen name="two_gear_second_margin_top">31dp</dimen>
+    <dimen name="two_gear_second_inner_diameter">6dp</dimen>
+    <dimen name="two_gear_second_main_diameter">55dp</dimen>
+    <dimen name="two_gear_second_second_diameter">44dp</dimen>
+    <dimen name="two_gear_second_teeth_width">7dp</dimen>
+    <dimen name="one_gear_inner_diameter">10dp</dimen>
+    <dimen name="one_gear_main_diameter">70dp</dimen>
+    <dimen name="one_gear_second_diameter">55dp</dimen>
+    <dimen name="one_gear_teeth_width">10dp</dimen>
+
+
+</resources>
