@@ -4,6 +4,8 @@ import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 
 import lj_3d.gearloadinglayout.enums.ShowMode;
@@ -17,6 +19,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Type mSelectedType = Type.ONE_GEAR;
     private Resources mResources;
+    private boolean blur;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final View bottomButton = findViewById(R.id.btn_bottom);
         final View leftButton = findViewById(R.id.btn_left);
         final View rightButton = findViewById(R.id.btn_rigth);
+
+        final CheckBox enableBlur = (CheckBox) findViewById(R.id.cb_blur);
 
         final RadioGroup radioGroup = (RadioGroup) findViewById(R.id.rg_types);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -45,6 +50,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mSelectedType = Type.THREE_GEARS;
                         break;
                 }
+            }
+        });
+
+        enableBlur.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                blur = isChecked;
             }
         });
 
@@ -71,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setShowDialogDuration(200)
                         .setShowMode(showMode)
                         .setDuration(3000)
+                        .blurBackground(blur)
                         .enableCutLayout(false)
                         .setDialogBackgroundAlpha(0.5f)
                         .setDialogBackgroundColor(mResources.getColor(R.color.colorAccent))
@@ -83,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setShowDialogDuration(200)
                         .setShowMode(showMode)
                         .setDuration(3000)
+                        .blurBackground(blur)
                         .enableCutLayout(false)
                         .setDialogBackgroundAlpha(0.5f)
                         .setDialogBackgroundColor(mResources.getColor(R.color.colorAccent))
@@ -96,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setShowDialogDuration(200)
                         .setShowMode(showMode)
                         .setDuration(3000)
+                        .blurBackground(blur)
                         .enableCutLayout(false)
                         .setDialogBackgroundAlpha(0.5f)
                         .setDialogBackgroundColor(mResources.getColor(R.color.colorAccent))
