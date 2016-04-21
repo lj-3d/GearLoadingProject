@@ -163,7 +163,7 @@ ____
 #### On Android Device
 
 With CutLayout                       |        One Gear         |        Two Gears      |        Three Gears      
-    :-------------------------:|:-------------------------::-------------------------:|:-------------------------:
+    :-------------------------:|
     ![](https://lh6.googleusercontent.com/-Lx8R57vmH8U/VxjqpOCUupI/AAAAAAAAC9E/fitOcLShGHMFeWnQ0iTMpm1dcREJzJfNACL0B/w259-h518-no/ezgif.com-video-to-gif%25285%2529.gif)|![](https://lh4.googleusercontent.com/-Kf_1IowqPoE/VxjqoivPVPI/AAAAAAAAC9A/nfq2zRwzdtYfS0TIHnGoL8GgG4b727eqQCL0B/w259-h518-no/ezgif.com-video-to-gif%25282%2529.gif)|![](https://lh6.googleusercontent.com/-5ZFp1Y6atRM/Vxjqo4qRGTI/AAAAAAAAC88/Hpv6Vj0eWR0C9bu9KVriYO5X2T8yQF_MACL0B/w259-h518-no/ezgif.com-video-to-gif%25283%2529.gif)|![](https://lh4.googleusercontent.com/-o3AKESFpQZE/Vxjqo5hRm5I/AAAAAAAAC84/53m7dVv6o6EfWDxyrsA0GZRCkck9_xEowCL0B/w259-h518-no/ezgif.com-video-to-gif%25284%2529.gif)
      
 
