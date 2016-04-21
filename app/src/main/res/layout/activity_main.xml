@@ -3,15 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="lj_3d.gearloadinglayout.MainActivity">
+    android:layout_height="match_parent">
 
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/girl"/>
+        android:src="@drawable/cloud"/>
 
     <RadioGroup
         android:id="@+id/rg_types"
@@ -49,6 +48,17 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:text="enable blur"/>
+
+    <CheckBox
+        android:id="@+id/cb_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:layout_below="@+id/cb_blur"
+        android:paddingRight="10dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:text="Snack Bar"/>
 
     <Button
         android:id="@+id/btn_top"

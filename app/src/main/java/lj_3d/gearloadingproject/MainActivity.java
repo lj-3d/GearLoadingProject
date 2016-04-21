@@ -1,16 +1,20 @@
 package lj_3d.gearloadingproject;
 
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 
 import lj_3d.gearloadinglayout.enums.ShowMode;
+import lj_3d.gearloadinglayout.enums.Style;
 import lj_3d.gearloadinglayout.enums.Type;
-import lj_3d.gearloadinglayout.gearViews.GearDialogBuilder;
+import lj_3d.gearloadinglayout.gearViews.GearView;
+import lj_3d.gearloadinglayout.utils.GearDialogBuilder;
 import lj_3d.gearloadinglayout.gearViews.OneGearLayout;
 import lj_3d.gearloadinglayout.gearViews.ThreeGearsLayout;
 import lj_3d.gearloadinglayout.gearViews.TwoGearsLayout;
@@ -20,11 +24,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Type mSelectedType = Type.ONE_GEAR;
     private Resources mResources;
     private boolean blur;
+    private Style mStyle = Style.SNACK_BAR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        ViewGroup rootView  = (ViewGroup) View.inflate(this, R.layout.activity_main, null);
+        setContentView(rootView);
+
         mResources = getResources();
 
         final View topButton = findViewById(R.id.btn_top);
@@ -34,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final View rightButton = findViewById(R.id.btn_rigth);
 
         final CheckBox enableBlur = (CheckBox) findViewById(R.id.cb_blur);
+        final CheckBox style = (CheckBox)findViewById(R.id.cb_mode);
 
         final RadioGroup radioGroup = (RadioGroup) findViewById(R.id.rg_types);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -60,6 +69,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        style.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mStyle = isChecked ? Style.SNACK_BAR : Style.DIALOG;
+            }
+        });
+
+        enableBlur.setChecked(true);
+        style.setChecked(true);
+//
         topButton.setTag(ShowMode.TOP);
         centerButton.setTag(ShowMode.CENTER);
         bottomButton.setTag(ShowMode.BOTTOM);
@@ -86,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .blurBackground(blur)
                         .enableCutLayout(false)
                         .setDialogBackgroundAlpha(0.5f)
+                        .setStyle(mStyle)
                         .setDialogBackgroundColor(mResources.getColor(R.color.colorAccent))
                         .setFirstGearColor(mResources.getColor(R.color.colorPrimaryDark))
                         .show();
@@ -99,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .blurBackground(blur)
                         .enableCutLayout(false)
                         .setDialogBackgroundAlpha(0.5f)
+                        .setStyle(mStyle)
                         .setDialogBackgroundColor(mResources.getColor(R.color.colorAccent))
                         .setFirstGearColor(mResources.getColor(R.color.colorPrimaryDark))
                         .setSecondGearColor(mResources.getColor(R.color.dialog_stroke_color))
@@ -113,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .blurBackground(blur)
                         .enableCutLayout(false)
                         .setDialogBackgroundAlpha(0.5f)
+                        .setStyle(mStyle)
                         .setDialogBackgroundColor(mResources.getColor(R.color.colorAccent))
                         .setFirstGearColor(mResources.getColor(R.color.colorPrimaryDark))
                         .setSecondGearColor(mResources.getColor(R.color.dialog_stroke_color))

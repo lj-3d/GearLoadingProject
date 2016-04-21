@@ -1,12 +1,12 @@
-package lj_3d.gearloadinglayout.gearViews;
+package lj_3d.gearloadinglayout.utils;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.view.ViewGroup;
 
-import lj_3d.gearloadinglayout.enums.ShowMode;
-import lj_3d.gearloadinglayout.enums.Type;
-import lj_3d.gearloadinglayout.utils.DeviceScreenHelper;
+import lj_3d.gearloadinglayout.gearViews.GearLoadingLayout;
+import lj_3d.gearloadinglayout.gearViews.OneGearLayout;
+import lj_3d.gearloadinglayout.gearViews.ThreeGearsLayout;
+import lj_3d.gearloadinglayout.gearViews.TwoGearsLayout;
 
 /**
  * Created by LJ on 21.03.2016.
@@ -38,7 +38,7 @@ public class GearDialogBuilder {
      */
 
     public <T extends GearLoadingLayout> T setType(Class<T> type) {
-
+        DeviceScreenHelper.isDialogMode = true;
         switch (type.getSimpleName()) {
             case OneGearLayout.IDENTIFIER:
                 mGearLoadingLayout = new OneGearLayout(mActivity);

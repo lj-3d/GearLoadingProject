@@ -4,11 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
-import android.graphics.drawable.shapes.Shape;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
@@ -20,6 +15,7 @@ import lj_3d.gearloadinglayout.R;
 import lj_3d.gearloadinglayout.enums.ShowMode;
 import lj_3d.gearloadinglayout.enums.Style;
 import lj_3d.gearloadinglayout.interfaces.OnBlurCompleteInterface;
+import lj_3d.gearloadinglayout.utils.DeviceScreenHelper;
 import lj_3d.gearloadinglayout.utils.FastBlur;
 
 /**
@@ -30,30 +26,30 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
     protected Resources mResources;
     protected Style mCurrentStyle = Style.SNACK_BAR;
 
-    public ViewGroup mActivityContentView;
-    public View mGearLayoutInnerWrapper;
-    public View mGearWrapper;
-    public RelativeLayout mMainWrapper;
-    public FrameLayout mGearLayoutWrapper;
-    public CutOutLayout mCutOutLayout;
-    public FrameLayout mMainBackground;
-    public ShowMode mShowMode = ShowMode.CENTER;
-    public FastBlur mFastBlur = new FastBlur();
+    protected ViewGroup mActivityContentView;
+    protected View mGearLayoutInnerWrapper;
+    protected View mGearWrapper;
+    protected RelativeLayout mMainWrapper;
+    protected FrameLayout mGearLayoutWrapper;
+    protected CutOutLayout mCutOutLayout;
+    protected FrameLayout mMainBackground;
+    protected ShowMode mShowMode = ShowMode.CENTER;
+    protected FastBlur mFastBlur = new FastBlur();
 
-    public int showDialogDuration = 333;
-    public int mDialogWidth;
-    public int mDialogHeight;
+    protected int showDialogDuration = 333;
+    protected int mDialogWidth;
+    protected int mDialogHeight;
 
 
-    private int mMainBackgroundColor = Color.TRANSPARENT;
-    private int mInnerWrapperColor = Color.TRANSPARENT;
-    public float mMainBackgroundAlpha;
+    protected int mMainBackgroundColor = Color.TRANSPARENT;
+    protected int mInnerWrapperColor = Color.TRANSPARENT;
+    protected float mMainBackgroundAlpha;
 
-    public boolean isDialogShown;
-    public boolean cancelable = true;
-    public boolean showDialog;
-    public boolean isAnimating;
-    private boolean isEnableBlur = true;
+    protected boolean isDialogShown;
+    protected boolean cancelable = true;
+    protected boolean showDialog;
+    protected boolean isAnimating;
+    protected boolean isEnableBlur = true;
 
     public GearLoadingLayout(Context context) {
         super(context);
@@ -70,6 +66,12 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
         mResources = getResources();
     }
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (!DeviceScreenHelper.isDialogMode)
+            mDialogHeight = h;
+    }
 
     protected void initUI(View rootView) {
         mMainWrapper = (RelativeLayout) rootView.findViewById(R.id.main_wrapper);
@@ -88,6 +90,9 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
 
 
     public void show() {
+        if (mActivityContentView == null) return;
+        mGearLayoutWrapper.getLayoutParams().height = mDialogHeight;
+        mGearLayoutWrapper.requestLayout();
         if (isEnableBlur) {
             mFastBlur.callBlur(mActivityContentView, mMainBackground, this);
         } else {
@@ -303,10 +308,13 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
     protected void parseAttributes(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.GearLoadingLayout);
 
-        setCutRadius((int) a.getDimension(R.styleable.GearLoadingLayout_loadingLayoutCutRadius, 120));
-        setCutLayoutColor(a.getColor(R.styleable.GearLoadingLayout_loadingLayoutCutColor, Color.WHITE));
+        setCutRadius((int) a.getDimension(R.styleable.GearLoadingLayout_gearLayoutCutRadius, 120));
+        setCutLayoutColor(a.getColor(R.styleable.GearLoadingLayout_gearLayoutCutColor, Color.WHITE));
         enableCutLayout(a.getBoolean(R.styleable.GearLoadingLayout_cutLayoutVisibility, true));
-        setCutLayoutAlpha(a.getFloat(R.styleable.GearLoadingLayout_loadingLayoutCutAlpha, 0.5f));
+        setCutLayoutAlpha(a.getFloat(R.styleable.GearLoadingLayout_gearLayoutCutAlpha, 0.5f));
+        setDialogBackgroundColor(a.getColor(R.styleable.GearLoadingLayout_layoutBackground, Color.WHITE));
+        setDialogBackgroundAlpha(a.getFloat(R.styleable.GearLoadingLayout_layoutAlpha, 1f));
+
 
         a.recycle();
         requestLayout();

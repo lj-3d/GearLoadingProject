@@ -11,10 +11,6 @@ import android.view.ViewTreeObserver;
 
 import lj_3d.gearloadinglayout.interfaces.OnBlurCompleteInterface;
 
-
-/**
- * Created by paveld on 3/6/14.
- */
 public class FastBlur {
 
     private float scaleFactor = 8;

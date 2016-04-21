@@ -56,7 +56,8 @@ public class ThreeGearsLayout extends GearLoadingLayout {
 
     private void initDimensions() {
         mDialogWidth = DeviceScreenHelper.mDeviceWidth;
-        mDialogHeight = mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height);
+        if (DeviceScreenHelper.isDialogMode)
+            mDialogHeight = mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height);
     }
 
     public void start() {
@@ -118,6 +119,11 @@ public class ThreeGearsLayout extends GearLoadingLayout {
     private ThreeGearsLayout setThirdGearInnerColor(int color, boolean enableCuttedCenter) {
         mThirdGearView.setInnerColor(color);
         mThirdGearView.enableCuttedCenter(enableCuttedCenter);
+        return this;
+    }
+
+    public ThreeGearsLayout setStyle(final Style style) {
+        super.setStyle(style);
         return this;
     }
 

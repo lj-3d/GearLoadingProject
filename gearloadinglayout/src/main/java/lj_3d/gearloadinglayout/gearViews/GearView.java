@@ -151,6 +151,7 @@ public class GearView extends View {
     }
 
     public void startSpinning(boolean reverse) {
+        setRotateAnimations();
         if (reverse) {
             startAnimation(rotateAnimationReverse);
         } else
@@ -161,10 +162,6 @@ public class GearView extends View {
         this.duration = duration;
         rotateAnimation.setDuration(duration);
         rotateAnimationReverse.setDuration(duration);
-    }
-
-    public void setSpinningAnimationListener(Animation.AnimationListener spinningAnimationListener) {
-        rotateAnimation.setAnimationListener(spinningAnimationListener);
     }
 
     public void setRotateAnimations() {

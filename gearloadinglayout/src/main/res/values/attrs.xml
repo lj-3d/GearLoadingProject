@@ -23,15 +23,14 @@
         <attr format="color" name="firstInnerGearColor"/>
         <attr format="color" name="secondInnerGearColor"/>
         <attr format="color" name="thirdInnerGearColor"/>
-        <attr format="color" name="loadingLayoutCutColor"/>
-        <attr format="color" name="loadingLayoutTextColor"/>
-        <attr format="dimension" name="loadingLayoutCutRadius"/>
-        <attr format="float" name="loadingLayoutCutAlpha"/>
+        <attr format="color" name="gearLayoutCutColor"/>
+        <attr format="color" name="layoutBackground"/>
+        <attr format="dimension" name="gearLayoutCutRadius"/>
+        <attr format="float" name="gearLayoutCutAlpha"/>
+        <attr format="float" name="layoutAlpha"/>
         <attr format="boolean" name="cutLayoutVisibility"/>
-        <attr format="boolean" name="loadingTextVisibility"/>
         <attr format="boolean" name="firstGearCuttedCenter"/>
         <attr format="boolean" name="secondGearCuttedCenter"/>
         <attr format="boolean" name="thirdGearCuttedCenter"/>
-        <attr format="string" name="loadingText"/>
     </declare-styleable>
 </resources>

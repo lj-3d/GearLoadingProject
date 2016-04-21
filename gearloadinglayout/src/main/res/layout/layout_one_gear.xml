@@ -16,7 +16,7 @@
     <FrameLayout
         android:id="@+id/gear_layout_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/one_gear_layout_wrapper_height">
+        android:layout_height="match_parent">
 
 
         <FrameLayout

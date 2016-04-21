@@ -8,6 +8,7 @@ import android.view.View;
 
 import lj_3d.gearloadinglayout.R;
 import lj_3d.gearloadinglayout.enums.ShowMode;
+import lj_3d.gearloadinglayout.enums.Style;
 import lj_3d.gearloadinglayout.utils.DeviceScreenHelper;
 
 /**
@@ -52,7 +53,8 @@ public class TwoGearsLayout extends GearLoadingLayout {
 
     private void initDimensions() {
         mDialogWidth = DeviceScreenHelper.mDeviceWidth;
-        mDialogHeight = mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height);
+        if (DeviceScreenHelper.isDialogMode)
+            mDialogHeight = mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height);
     }
 
     public void start() {
@@ -97,6 +99,11 @@ public class TwoGearsLayout extends GearLoadingLayout {
     private TwoGearsLayout setSecondGearInnerColor(int color, boolean enableCuttedCenter) {
         mSecondGearView.setInnerColor(color);
         mSecondGearView.enableCuttedCenter(enableCuttedCenter);
+        return this;
+    }
+
+    public TwoGearsLayout setStyle(final Style style) {
+        super.setStyle(style);
         return this;
     }
 

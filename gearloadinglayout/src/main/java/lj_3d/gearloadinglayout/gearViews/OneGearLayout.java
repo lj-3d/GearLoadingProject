@@ -8,12 +8,13 @@ import android.view.View;
 
 import lj_3d.gearloadinglayout.R;
 import lj_3d.gearloadinglayout.enums.ShowMode;
+import lj_3d.gearloadinglayout.enums.Style;
 import lj_3d.gearloadinglayout.utils.DeviceScreenHelper;
 
 /**
  * Created by LJ on 23.03.2016.
  */
-public class OneGearLayout extends GearLoadingLayout{
+public class OneGearLayout extends GearLoadingLayout {
 
     public static final String IDENTIFIER = "OneGearLayout";
 
@@ -50,12 +51,15 @@ public class OneGearLayout extends GearLoadingLayout{
 
     private void initDimensions() {
         mDialogWidth = DeviceScreenHelper.mDeviceWidth;
-        mDialogHeight = mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height);
+        if (DeviceScreenHelper.isDialogMode)
+            mDialogHeight = mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height);
     }
 
     public void start() {
         mFirstGearView.startSpinning(false);
     }
+
+
 
     public OneGearLayout setDuration(final int duration) {
         mFirstGearView.setDuration(duration);
@@ -75,6 +79,11 @@ public class OneGearLayout extends GearLoadingLayout{
     private OneGearLayout setFirstGearInnerColor(int color, boolean enableCuttedCenter) {
         mFirstGearView.setInnerColor(color);
         mFirstGearView.enableCuttedCenter(enableCuttedCenter);
+        return this;
+    }
+
+    public OneGearLayout setStyle(final Style style) {
+        super.setStyle(style);
         return this;
     }
 

@@ -16,7 +16,7 @@
     <FrameLayout
         android:id="@+id/gear_layout_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/two_gear_layout_wrapper_height">
+        android:layout_height="match_parent">
 
 
         <FrameLayout
@@ -28,7 +28,7 @@
             android:id="@+id/gears_wrapper"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|top"
+            android:layout_gravity="center"
             android:padding="@dimen/padding_5">
 
             <lj_3d.gearloadinglayout.gearViews.GearView
