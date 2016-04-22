@@ -1,4 +1,10 @@
 <resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="gear_layout_wrapper_height">240dp</dimen>
+    <dimen name="divider_height">2dp</dimen>
+    <dimen name="margin_10">10dp</dimen>
     <dimen name="shape_stroke_corner_width">1dp</dimen>
     <dimen name="padding_5">5dp</dimen>
     <dimen name="padding_10">10dp</dimen>
@@ -40,6 +46,5 @@
     <dimen name="one_gear_main_diameter">70dp</dimen>
     <dimen name="one_gear_second_diameter">55dp</dimen>
     <dimen name="one_gear_teeth_width">10dp</dimen>
-
 
 </resources>
