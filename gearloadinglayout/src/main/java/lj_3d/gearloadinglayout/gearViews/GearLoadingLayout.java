@@ -52,25 +52,17 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
     protected boolean isEnableBlur = true;
 
     public GearLoadingLayout(Context context) {
-        super(context);
-        mResources = getResources();
+        this(context, null);
     }
 
     public GearLoadingLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mResources = getResources();
+        this(context, attrs, 0);
     }
 
     public GearLoadingLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mDialogWidth = DeviceScreenHelper.mDeviceWidth;
         mResources = getResources();
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        if (!DeviceScreenHelper.isDialogMode)
-            mDialogHeight = h;
     }
 
     protected void initUI(View rootView) {
@@ -145,6 +137,16 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
 
     public GearLoadingLayout setCutRadius(int radius) {
         mCutOutLayout.setCutRadius(radius);
+        return this;
+    }
+
+    public GearLoadingLayout setShadowWidth(int width) {
+        mCutOutLayout.setShadowWidth(width);
+        return this;
+    }
+
+    public GearLoadingLayout setShadowColor(int color) {
+        mCutOutLayout.setShadowColor(color);
         return this;
     }
 
@@ -230,9 +232,9 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
 
     private void applyStyle() {
         if (mCurrentStyle == Style.DIALOG) {
-            mGearLayoutWrapper.setBackgroundColor(Color.TRANSPARENT);
+//            mGearLayoutWrapper.setBackgroundColor(Color.TRANSPARENT);
             mGearLayoutInnerWrapper.setBackgroundColor(Color.TRANSPARENT);
-            mCutOutLayout.setVisibility(GONE);
+//            mCutOutLayout.setVisibility(GONE);
         }
     }
 
@@ -307,8 +309,6 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
 
     protected void parseAttributes(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.GearLoadingLayout);
-
-        setCutRadius((int) a.getDimension(R.styleable.GearLoadingLayout_gearLayoutCutRadius, 120));
         setCutLayoutColor(a.getColor(R.styleable.GearLoadingLayout_gearLayoutCutColor, Color.WHITE));
         enableCutLayout(a.getBoolean(R.styleable.GearLoadingLayout_cutLayoutVisibility, true));
         setCutLayoutAlpha(a.getFloat(R.styleable.GearLoadingLayout_gearLayoutCutAlpha, 0.5f));

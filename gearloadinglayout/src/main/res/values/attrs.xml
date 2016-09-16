@@ -1,35 +1,37 @@
 <resources>
     <declare-styleable name="GearView">
-        <attr format="color" name="mainColor"/>
-        <attr format="color" name="innerColor"/>
-        <attr format="float" name="rotateAngle"/>
-        <attr format="dimension" name="mainDiameter"/>
-        <attr format="dimension" name="secondDiameter"/>
-        <attr format="dimension" name="innerDiameter"/>
-        <attr format="dimension" name="teethWidth"/>
-        <attr format="boolean" name="enableCutCenter"/>
+        <attr name="mainColor" format="color"/>
+        <attr name="innerColor" format="color"/>
+        <attr name="rotateAngle" format="float"/>
+        <attr name="mainDiameter" format="dimension"/>
+        <attr name="secondDiameter" format="dimension"/>
+        <attr name="innerDiameter" format="dimension"/>
+        <attr name="teethWidth" format="dimension"/>
+        <attr name="enableCutCenter" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="CutOutLayout">
-        <attr format="color" name="cutLayoutColor"/>
-        <attr format="dimension" name="cutRadius"/>
+        <attr name="cutLayoutColor" format="color"/>
+        <attr name="cutRadius" format="dimension"/>
+        <attr name="shadowWidth" format="dimension"/>
+        <attr name="shadowColor" format="color"/>
     </declare-styleable>
 
     <declare-styleable name="GearLoadingLayout">
-        <attr format="color" name="firstGearColor"/>
-        <attr format="color" name="secondGearColor"/>
-        <attr format="color" name="thirdGearColor"/>
-        <attr format="color" name="firstInnerGearColor"/>
-        <attr format="color" name="secondInnerGearColor"/>
-        <attr format="color" name="thirdInnerGearColor"/>
-        <attr format="color" name="gearLayoutCutColor"/>
-        <attr format="color" name="layoutBackground"/>
-        <attr format="dimension" name="gearLayoutCutRadius"/>
-        <attr format="float" name="gearLayoutCutAlpha"/>
-        <attr format="float" name="layoutAlpha"/>
-        <attr format="boolean" name="cutLayoutVisibility"/>
-        <attr format="boolean" name="firstGearCuttedCenter"/>
-        <attr format="boolean" name="secondGearCuttedCenter"/>
-        <attr format="boolean" name="thirdGearCuttedCenter"/>
+        <attr name="firstGearColor" format="color"/>
+        <attr name="secondGearColor" format="color"/>
+        <attr name="thirdGearColor" format="color"/>
+        <attr name="firstInnerGearColor" format="color"/>
+        <attr name="secondInnerGearColor" format="color"/>
+        <attr name="thirdInnerGearColor" format="color"/>
+        <attr name="gearLayoutCutColor" format="color"/>
+        <attr name="layoutBackground" format="color"/>
+        <attr name="gearLayoutCutRadius" format="dimension"/>
+        <attr name="gearLayoutCutAlpha" format="float"/>
+        <attr name="layoutAlpha" format="float"/>
+        <attr name="cutLayoutVisibility" format="boolean"/>
+        <attr name="firstGearCuttedCenter" format="boolean"/>
+        <attr name="secondGearCuttedCenter" format="boolean"/>
+        <attr name="thirdGearCuttedCenter" format="boolean"/>
     </declare-styleable>
 </resources>

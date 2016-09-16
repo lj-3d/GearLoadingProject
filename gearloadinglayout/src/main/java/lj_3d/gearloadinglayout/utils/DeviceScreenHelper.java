@@ -10,7 +10,6 @@ public class DeviceScreenHelper {
 
     public static int mDeviceWidth;
     public static int mDeviceHeight;
-    public static boolean isDialogMode;
 
     public static void init(final Activity activity) {
         if (activity == null) return;

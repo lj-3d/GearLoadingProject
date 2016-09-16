@@ -22,14 +22,11 @@ public class TwoGearsLayout extends GearLoadingLayout {
     private GearView mSecondGearView;
 
     public TwoGearsLayout(Context context) {
-        super(context);
-        addChildView();
+        this(context, null);
     }
 
     public TwoGearsLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        addChildView();
-        parseAttributes(attrs);
+        this(context, attrs, 0);
     }
 
     public TwoGearsLayout(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -46,16 +43,10 @@ public class TwoGearsLayout extends GearLoadingLayout {
 
     protected void initUI(View rootView) {
         super.initUI(rootView);
-        initDimensions();
         mFirstGearView = (GearView) rootView.findViewById(R.id.gear_view);
         mSecondGearView = (GearView) rootView.findViewById(R.id.gear_view_second);
     }
 
-    private void initDimensions() {
-        mDialogWidth = DeviceScreenHelper.mDeviceWidth;
-        if (DeviceScreenHelper.isDialogMode)
-            mDialogHeight = mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height);
-    }
 
     public void start() {
         mFirstGearView.startSpinning(false);
@@ -89,6 +80,16 @@ public class TwoGearsLayout extends GearLoadingLayout {
         return this;
     }
 
+    public TwoGearsLayout setShadowColor(int color) {
+        super.setShadowColor(color);
+        return this;
+    }
+
+    public TwoGearsLayout setShadowWidth(int width) {
+        super.setShadowWidth(width);
+        return this;
+    }
+
 
     private TwoGearsLayout setFirstGearInnerColor(int color, boolean enableCuttedCenter) {
         mFirstGearView.setInnerColor(color);
@@ -104,6 +105,7 @@ public class TwoGearsLayout extends GearLoadingLayout {
 
     public TwoGearsLayout setStyle(final Style style) {
         super.setStyle(style);
+        mDialogHeight = style == Style.SNACK_BAR ? mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height) : DeviceScreenHelper.mDeviceHeight;
         return this;
     }
 

@@ -24,14 +24,11 @@ public class ThreeGearsLayout extends GearLoadingLayout {
     private GearView mThirdGearView;
 
     public ThreeGearsLayout(Context context) {
-        super(context);
-        addChildView();
+        this(context, null);
     }
 
     public ThreeGearsLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        addChildView();
-        parseAttributes(attrs);
+        this(context, attrs, 0);
     }
 
     public ThreeGearsLayout(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -48,17 +45,11 @@ public class ThreeGearsLayout extends GearLoadingLayout {
 
     protected void initUI(View rootView) {
         super.initUI(rootView);
-        initDimensions();
         mFirstGearView = (GearView) rootView.findViewById(R.id.gear_view);
         mSecondGearView = (GearView) rootView.findViewById(R.id.gear_view_second);
         mThirdGearView = (GearView) rootView.findViewById(R.id.gear_view_third);
     }
 
-    private void initDimensions() {
-        mDialogWidth = DeviceScreenHelper.mDeviceWidth;
-        if (DeviceScreenHelper.isDialogMode)
-            mDialogHeight = mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height);
-    }
 
     public void start() {
         mFirstGearView.startSpinning(false);
@@ -104,6 +95,16 @@ public class ThreeGearsLayout extends GearLoadingLayout {
         return this;
     }
 
+    public ThreeGearsLayout setShadowColor(int color) {
+        super.setShadowColor(color);
+        return this;
+    }
+
+    public ThreeGearsLayout setShadowWidth(int width) {
+        super.setShadowWidth(width);
+        return this;
+    }
+
     private ThreeGearsLayout setFirstGearInnerColor(int color, boolean enableCuttedCenter) {
         mFirstGearView.setInnerColor(color);
         mFirstGearView.enableCuttedCenter(enableCuttedCenter);
@@ -124,6 +125,7 @@ public class ThreeGearsLayout extends GearLoadingLayout {
 
     public ThreeGearsLayout setStyle(final Style style) {
         super.setStyle(style);
+        mDialogHeight = style == Style.SNACK_BAR ? mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height) : DeviceScreenHelper.mDeviceHeight;
         return this;
     }
 

@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ViewGroup rootView  = (ViewGroup) View.inflate(this, R.layout.activity_main, null);
+        ViewGroup rootView = (ViewGroup) View.inflate(this, R.layout.activity_main, null);
         setContentView(rootView);
 
         mResources = getResources();
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final View rightButton = findViewById(R.id.btn_rigth);
 
         final CheckBox enableBlur = (CheckBox) findViewById(R.id.cb_blur);
-        final CheckBox style = (CheckBox)findViewById(R.id.cb_mode);
+        final CheckBox style = (CheckBox) findViewById(R.id.cb_mode);
 
         final RadioGroup radioGroup = (RadioGroup) findViewById(R.id.rg_types);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -103,11 +103,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setShowMode(showMode)
                         .setDuration(3000)
                         .blurBackground(blur)
-                        .enableCutLayout(false)
-                        .setDialogBackgroundAlpha(0.5f)
+                        .enableCutLayout(true)
+                        .setCutLayoutAlpha(0.5f)
                         .setStyle(mStyle)
-                        .setDialogBackgroundColor(mResources.getColor(R.color.colorAccent))
-                        .setFirstGearColor(mResources.getColor(R.color.colorPrimaryDark))
+                        .setDialogBackgroundColor(Color.TRANSPARENT)
+                        .setMainBackgroundColor(Color.TRANSPARENT)
+                        .setCutLayoutColor(mResources.getColor(android.R.color.white))
+                        .setFirstGearColor(mResources.getColor(android.R.color.white))
                         .show();
                 break;
             case TWO_GEARS:
@@ -117,12 +119,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setShowMode(showMode)
                         .setDuration(3000)
                         .blurBackground(blur)
-                        .enableCutLayout(false)
-                        .setDialogBackgroundAlpha(0.5f)
+                        .enableCutLayout(true)
+                        .setCutLayoutAlpha(0.5f)
                         .setStyle(mStyle)
-                        .setDialogBackgroundColor(mResources.getColor(R.color.colorAccent))
-                        .setFirstGearColor(mResources.getColor(R.color.colorPrimaryDark))
-                        .setSecondGearColor(mResources.getColor(R.color.dialog_stroke_color))
+                        .setDialogBackgroundColor(Color.TRANSPARENT)
+                        .setMainBackgroundColor(Color.TRANSPARENT)
+                        .setCutLayoutColor(mResources.getColor(android.R.color.white))
+                        .setFirstGearColor(mResources.getColor(android.R.color.white))
+                        .setSecondGearColor(mResources.getColor(android.R.color.white))
                         .show();
                 break;
             case THREE_GEARS:
@@ -132,13 +136,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setShowMode(showMode)
                         .setDuration(3000)
                         .blurBackground(blur)
-                        .enableCutLayout(false)
-                        .setDialogBackgroundAlpha(0.5f)
+                        .enableCutLayout(true)
+                        .setCutRadius(80)
+                        .setCutLayoutAlpha(0.5f)
                         .setStyle(mStyle)
-                        .setDialogBackgroundColor(mResources.getColor(R.color.colorAccent))
-                        .setFirstGearColor(mResources.getColor(R.color.colorPrimaryDark))
-                        .setSecondGearColor(mResources.getColor(R.color.dialog_stroke_color))
-                        .setThirdGearColor(mResources.getColor(R.color.colorPrimary))
+                        .setDialogBackgroundColor(Color.TRANSPARENT)
+                        .setMainBackgroundColor(Color.TRANSPARENT)
+                        .setShadowWidth(getResources().getDimensionPixelSize(R.dimen.shadow_width))
+                        .setCutLayoutColor(mResources.getColor(android.R.color.white))
+                        .setFirstGearColor(mResources.getColor(android.R.color.white))
+                        .setSecondGearColor(mResources.getColor(android.R.color.white))
+                        .setThirdGearColor(mResources.getColor(android.R.color.white))
                         .show();
                 break;
         }

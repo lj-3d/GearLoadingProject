@@ -38,7 +38,6 @@ public class GearDialogBuilder {
      */
 
     public <T extends GearLoadingLayout> T setType(Class<T> type) {
-        DeviceScreenHelper.isDialogMode = true;
         switch (type.getSimpleName()) {
             case OneGearLayout.IDENTIFIER:
                 mGearLoadingLayout = new OneGearLayout(mActivity);

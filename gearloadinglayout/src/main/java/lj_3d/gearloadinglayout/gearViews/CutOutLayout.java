@@ -1,7 +1,10 @@
 package lj_3d.gearloadinglayout.gearViews;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -19,19 +22,39 @@ import lj_3d.gearloadinglayout.R;
 public class CutOutLayout extends View {
 
     private int color;
+    private int shadowColor;
+    private int shadowWidth;
     private int cutRadius;
     private int height = 218;
     private int width = 620;
-    private Paint paint;
-    private Paint shadow;
-    private final PorterDuffXfermode mPorterDuffXfermode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+    private Paint mainPaint = new Paint();
+    private Paint shadowPaint = new Paint();
+    private Paint shadowClearPaint = new Paint();
+    private final PorterDuffXfermode mPorterDuffXfermodeClear = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+    private final PorterDuffXfermode mPorterDuffXfermodeShadowClear = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+    private Resources mResources;
+    private Bitmap mShadowBitmap;
 
     public void setColor(int backgroundColor) {
         this.color = backgroundColor;
+        invalidate();
+    }
+
+    public void setShadowColor(int shadowColor) {
+        this.shadowColor = shadowColor;
+        updateTools();
+        invalidate();
+    }
+
+    public void setShadowWidth(int shadowWidth) {
+        this.shadowWidth = shadowWidth;
+        updateTools();
+        invalidate();
     }
 
     public void setWidth(int width) {
         this.width = width;
+        updateTools();
         requestLayout();
     }
 
@@ -44,24 +67,25 @@ public class CutOutLayout extends View {
         if (cutRadius == 0)
             return;
         this.cutRadius = cutRadius;
-        requestLayout();
+        updateTools();
+        invalidate();
     }
 
 
     public CutOutLayout(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public CutOutLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        parseAttributes(attrs);
-        initTools();
+        this(context, attrs, 0);
     }
 
     public CutOutLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        parseAttributes(attrs);
+        mResources = getResources();
         initTools();
+        parseAttributes(attrs);
+        shadowPaint.setMaskFilter(new BlurMaskFilter(shadowWidth, BlurMaskFilter.Blur.NORMAL));
     }
 
 
@@ -73,27 +97,28 @@ public class CutOutLayout extends View {
     }
 
     private void initTools() {
-        paint = new Paint();
-        shadow = new Paint();
-        shadow.setShadowLayer(15, 0.0f, 0.0f, getResources().getColor(R.color.shadow_grey));
-        shadow.setAntiAlias(true);
-        shadow.setDither(true);
-        shadow.setColor(getResources().getColor(R.color.shadow_grey));
-        shadow.setStyle(Paint.Style.STROKE);
-        shadow.setAlpha(70);
-        shadow.setStrokeWidth(7);
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setXfermode(mPorterDuffXfermode);
+        shadowPaint.setAntiAlias(true);
+        shadowPaint.setDither(true);
+        shadowClearPaint.setAntiAlias(true);
+        shadowClearPaint.setDither(true);
+        mainPaint.setAntiAlias(true);
+        mainPaint.setDither(true);
+        shadowPaint.setStyle(Paint.Style.STROKE);
+        mainPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mainPaint.setXfermode(mPorterDuffXfermodeClear);
+        shadowClearPaint.setXfermode(mPorterDuffXfermodeShadowClear);
+        shadowClearPaint.setStyle(Paint.Style.STROKE);
+        shadowClearPaint.setColor(Color.TRANSPARENT);
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
     }
 
     private void parseAttributes(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.CutOutLayout);
 
-        color = a.getColor(R.styleable.CutOutLayout_cutLayoutColor, Color.WHITE);
-        setColor(color);
-
-        cutRadius = (int) a.getDimension(R.styleable.CutOutLayout_cutRadius, 50);
-        setCutRadius(cutRadius);
+        setColor(a.getColor(R.styleable.CutOutLayout_cutLayoutColor, Color.WHITE));
+        setCutRadius((int) a.getDimension(R.styleable.CutOutLayout_cutRadius, mResources.getDimensionPixelSize(R.dimen.cut_layout_diameter)));
+        setShadowWidth((int) a.getDimension(R.styleable.CutOutLayout_shadowWidth, mResources.getDimensionPixelSize(R.dimen.shadow_width)));
+        setShadowColor(a.getColor(R.styleable.CutOutLayout_shadowColor, mResources.getColor(R.color.shadow_grey)));
 
         a.recycle();
         requestLayout();
@@ -103,8 +128,26 @@ public class CutOutLayout extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawColor(color);
-        canvas.drawCircle(width / 2, height / 2, cutRadius, paint);
-        canvas.drawCircle(width / 2, height / 2, cutRadius, shadow);
+        canvas.drawCircle(width / 2, height / 2, cutRadius, mainPaint);
+        if (mShadowBitmap == null)
+            mShadowBitmap = prepareShadow();
+        canvas.drawBitmap(mShadowBitmap, (width / 2) - cutRadius, height / 2 - cutRadius, null);
     }
+
+    private void updateTools() {
+        shadowPaint.setColor(shadowColor);
+        shadowPaint.setStrokeWidth(shadowWidth);
+        shadowClearPaint.setStrokeWidth(cutRadius);
+    }
+
+    private Bitmap prepareShadow() {
+        final int diameter = cutRadius * 2;
+        final Bitmap bitmap = Bitmap.createBitmap(diameter, diameter, Bitmap.Config.ARGB_8888);
+        final Canvas shadowCanvas = new Canvas(bitmap);
+        shadowCanvas.drawCircle(cutRadius, cutRadius, cutRadius + (shadowWidth / 2), shadowPaint);
+        shadowCanvas.drawCircle(cutRadius, cutRadius, cutRadius * 1.5f, shadowClearPaint);
+        return bitmap;
+    }
+
 
 }

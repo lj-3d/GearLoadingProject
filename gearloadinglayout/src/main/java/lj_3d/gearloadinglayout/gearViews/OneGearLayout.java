@@ -21,14 +21,11 @@ public class OneGearLayout extends GearLoadingLayout {
     private GearView mFirstGearView;
 
     public OneGearLayout(Context context) {
-        super(context);
-        addChildView();
+        this(context, null);
     }
 
     public OneGearLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        addChildView();
-        parseAttributes(attrs);
+        this(context, attrs, 0);
     }
 
     public OneGearLayout(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -45,20 +42,13 @@ public class OneGearLayout extends GearLoadingLayout {
 
     protected void initUI(View rootView) {
         super.initUI(rootView);
-        initDimensions();
         mFirstGearView = (GearView) rootView.findViewById(R.id.gear_view);
     }
 
-    private void initDimensions() {
-        mDialogWidth = DeviceScreenHelper.mDeviceWidth;
-        if (DeviceScreenHelper.isDialogMode)
-            mDialogHeight = mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height);
-    }
 
     public void start() {
         mFirstGearView.startSpinning(false);
     }
-
 
 
     public OneGearLayout setDuration(final int duration) {
@@ -84,6 +74,7 @@ public class OneGearLayout extends GearLoadingLayout {
 
     public OneGearLayout setStyle(final Style style) {
         super.setStyle(style);
+        mDialogHeight = style == Style.SNACK_BAR ? mResources.getDimensionPixelSize(R.dimen.three_gear_layout_wrapper_height) : DeviceScreenHelper.mDeviceHeight;
         return this;
     }
 
@@ -114,6 +105,16 @@ public class OneGearLayout extends GearLoadingLayout {
 
     public OneGearLayout setCutRadius(int radius) {
         super.setCutRadius(radius);
+        return this;
+    }
+
+    public OneGearLayout setShadowColor(int color) {
+        super.setShadowColor(color);
+        return this;
+    }
+
+    public OneGearLayout setShadowWidth(int width) {
+        super.setShadowWidth(width);
         return this;
     }
 
