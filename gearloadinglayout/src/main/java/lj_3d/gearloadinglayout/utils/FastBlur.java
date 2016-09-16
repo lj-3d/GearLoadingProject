@@ -13,8 +13,17 @@ import lj_3d.gearloadinglayout.interfaces.OnBlurCompleteInterface;
 
 public class FastBlur {
 
-    private float scaleFactor = 8;
+    private float scaleFactor = 8f;
     private int radius = 5;
+
+    public FastBlur() {
+
+    }
+
+    public FastBlur(final int radius, final float scaleFactor) {
+        this.radius = radius;
+        this.scaleFactor = scaleFactor;
+    }
 
     public static Bitmap doBlur(Bitmap sentBitmap, int radius, boolean canReuseInBitmap) {
 

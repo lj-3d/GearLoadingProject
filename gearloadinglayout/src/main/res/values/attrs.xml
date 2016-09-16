@@ -33,5 +33,7 @@
         <attr name="firstGearCuttedCenter" format="boolean"/>
         <attr name="secondGearCuttedCenter" format="boolean"/>
         <attr name="thirdGearCuttedCenter" format="boolean"/>
+        <attr name="gearLayoutShadowWidth" format="dimension"/>
+        <attr name="gearLayoutShadowColor" format="color"/>
     </declare-styleable>
 </resources>

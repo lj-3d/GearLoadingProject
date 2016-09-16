@@ -6,4 +6,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="dialog_stroke_color">#868686</color>
     <color name="transparent">#00000000</color>
+    <color name="white">#ffffff</color>
 </resources>

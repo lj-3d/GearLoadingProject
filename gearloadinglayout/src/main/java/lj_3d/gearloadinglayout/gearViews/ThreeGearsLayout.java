@@ -11,6 +11,7 @@ import lj_3d.gearloadinglayout.R;
 import lj_3d.gearloadinglayout.enums.ShowMode;
 import lj_3d.gearloadinglayout.enums.Style;
 import lj_3d.gearloadinglayout.utils.DeviceScreenHelper;
+import lj_3d.gearloadinglayout.utils.FastBlur;
 
 /**
  * Created by LJ on 23.03.2016.
@@ -180,7 +181,12 @@ public class ThreeGearsLayout extends GearLoadingLayout {
     }
 
     public ThreeGearsLayout blurBackground(boolean enable) {
-        super.blurBackground(enable);
+        blurBackground(enable, 0, 0);
+        return this;
+    }
+
+    public ThreeGearsLayout blurBackground(boolean enable, int radius, float scaleFactor) {
+        super.blurBackground(enable, radius, scaleFactor);
         return this;
     }
 

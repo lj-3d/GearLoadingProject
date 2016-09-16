@@ -174,8 +174,13 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
         return this;
     }
 
-    public GearLoadingLayout blurBackground(boolean enable) {
+    public GearLoadingLayout blurBackground(boolean enable, int radius, float scaleFactor) {
         isEnableBlur = enable;
+        if (isEnableBlur) {
+            if (radius > 0 && scaleFactor > 0)
+                mFastBlur = new FastBlur(radius, scaleFactor);
+            else mFastBlur = new FastBlur();
+        }
         return this;
     }
 
@@ -309,12 +314,14 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
 
     protected void parseAttributes(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.GearLoadingLayout);
+        setCutRadius((int) a.getDimension(R.styleable.GearLoadingLayout_gearLayoutCutRadius, mResources.getDimensionPixelSize(R.dimen.cut_layout_diameter)));
         setCutLayoutColor(a.getColor(R.styleable.GearLoadingLayout_gearLayoutCutColor, Color.WHITE));
         enableCutLayout(a.getBoolean(R.styleable.GearLoadingLayout_cutLayoutVisibility, true));
         setCutLayoutAlpha(a.getFloat(R.styleable.GearLoadingLayout_gearLayoutCutAlpha, 0.5f));
         setDialogBackgroundColor(a.getColor(R.styleable.GearLoadingLayout_layoutBackground, Color.WHITE));
         setDialogBackgroundAlpha(a.getFloat(R.styleable.GearLoadingLayout_layoutAlpha, 1f));
-
+        setShadowWidth((int) a.getDimension(R.styleable.GearLoadingLayout_gearLayoutShadowWidth, mResources.getDimensionPixelSize(R.dimen.shadow_width)));
+        setShadowColor(a.getColor(R.styleable.GearLoadingLayout_gearLayoutShadowColor, mResources.getColor(R.color.shadow_grey)));
 
         a.recycle();
         requestLayout();

@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Type mSelectedType = Type.ONE_GEAR;
     private Resources mResources;
-    private boolean blur;
+    private boolean blur = true;
     private Style mStyle = Style.SNACK_BAR;
 
     @Override

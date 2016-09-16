@@ -139,7 +139,12 @@ public class OneGearLayout extends GearLoadingLayout {
     }
 
     public OneGearLayout blurBackground(boolean enable) {
-        super.blurBackground(enable);
+        blurBackground(enable, 0, 0);
+        return this;
+    }
+
+    public OneGearLayout blurBackground(boolean enable, int radius, float scaleFactor) {
+        super.blurBackground(enable, radius, scaleFactor);
         return this;
     }
 
