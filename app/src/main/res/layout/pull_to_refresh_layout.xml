@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout
+        android:id="@+id/ptr_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <lj_3d.gearloadinglayout.gearViews.ThreeGearsLayout
+            android:id="@+id/gear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/pull_to_refresh_threshold"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"/>
+
+    </lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout>
+
+</LinearLayout>
