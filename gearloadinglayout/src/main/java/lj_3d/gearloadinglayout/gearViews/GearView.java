@@ -1,5 +1,7 @@
 package lj_3d.gearloadinglayout.gearViews;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -11,6 +13,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Animation;
@@ -30,8 +33,9 @@ public class GearView extends View {
     private Paint cutCenterPaint;
 
     private Path path;
-    private RotateAnimation rotateAnimation;
-    private RotateAnimation rotateAnimationReverse;
+
+    private ObjectAnimator rotateAnimation = new ObjectAnimator();
+
     private final PorterDuffXfermode mPorterDuffXfermode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
 
     private int cutOffset;
@@ -39,7 +43,7 @@ public class GearView extends View {
     private int teethWidth = 40;
     private int mainDiameter = 400;
     private int secondDiameter = 150;
-    private int duration = 5000;
+    private int duration = 3000;
     private int innerDiameter = mainDiameter / 6;
 
     private int mainColor = Color.RED;
@@ -51,21 +55,20 @@ public class GearView extends View {
     private Bitmap teeth;
     private Matrix matrix;
 
+    private boolean reverse;
+
     public GearView(Context context) {
-        super(context);
-        initAndConfigTools();
+        this(context, null);
     }
 
     public GearView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        parseAttributes(attrs);
-        initAndConfigTools();
+        this(context, attrs, 0);
     }
 
     public GearView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        initBaseTools();
         parseAttributes(attrs);
-        initAndConfigTools();
     }
 
     @Override
@@ -116,72 +119,81 @@ public class GearView extends View {
         this.innerDiameter = innerDiameter;
     }
 
-    private void initAndConfigTools() {
-        mainTeethPaint = new Paint();
-        mainCirclePaint = new Paint();
-        innerCirclePaint = new Paint();
-        cutCenterPaint = new Paint();
-
-        path = new Path();
-        mainTeethPaint.setAntiAlias(true);
-        mainTeethPaint.setDither(true);
-        mainTeethPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mainTeethPaint.setColor(mainColor);
-        mainTeethPaint.setStrokeJoin(Paint.Join.ROUND);
-        mainTeethPaint.setStrokeCap(Paint.Cap.ROUND);
-        mainTeethPaint.setPathEffect(new CornerPathEffect(2));
-
-        mainCirclePaint.setAntiAlias(true);
-        mainCirclePaint.setDither(true);
-        mainCirclePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mainCirclePaint.setColor(mainColor);
-
-        innerCirclePaint.setAntiAlias(true);
-        innerCirclePaint.setDither(true);
-        innerCirclePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        innerCirclePaint.setColor(innerColor);
-
-        cutCenterPaint.setAntiAlias(true);
-        cutCenterPaint.setDither(true);
-        cutCenterPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        cutCenterPaint.setXfermode(mPorterDuffXfermode);
-        matrix = new Matrix();
-
-        setRotateAnimations();
-    }
 
     public void startSpinning(boolean reverse) {
-        setRotateAnimations();
-        if (reverse) {
-            startAnimation(rotateAnimationReverse);
-        } else
-            startAnimation(rotateAnimation);
+        this.reverse = reverse;
+
+        rotateAnimation.start();
+    }
+
+    public void stopSpinning() {
+        rotateAnimation.cancel();
     }
 
     public void setDuration(int duration) {
         this.duration = duration;
         rotateAnimation.setDuration(duration);
-        rotateAnimationReverse.setDuration(duration);
     }
 
-    public void setRotateAnimations() {
-        rotateAnimation = new RotateAnimation(0, 360, mainDiameter / 2, mainDiameter / 2);
-        rotateAnimationReverse = new RotateAnimation(360, 0, mainDiameter / 2, mainDiameter / 2);
-        rotateAnimation.setDuration(duration);
+
+    private void initBaseTools() {
+        mainTeethPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mainCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        innerCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        cutCenterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        mainTeethPaint.setDither(true);
+        mainCirclePaint.setDither(true);
+        innerCirclePaint.setDither(true);
+        cutCenterPaint.setDither(true);
+
+        mainTeethPaint.setStrokeJoin(Paint.Join.ROUND);
+        mainTeethPaint.setStrokeCap(Paint.Cap.ROUND);
+        mainTeethPaint.setPathEffect(new CornerPathEffect(2));
+
+        mainCirclePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+
+        innerCirclePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+
+        path = new Path();
+
+        cutCenterPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        cutCenterPaint.setXfermode(mPorterDuffXfermode);
+        matrix = new Matrix();
+
         rotateAnimation.setRepeatCount(Animation.INFINITE);
         rotateAnimation.setInterpolator(new LinearInterpolator());
-        rotateAnimationReverse.setDuration(duration);
-        rotateAnimationReverse.setRepeatCount(Animation.INFINITE);
-        rotateAnimationReverse.setInterpolator(new LinearInterpolator());
+
+        rotateAnimation.setFloatValues(0f, 360f);
+        rotateAnimation.setDuration(duration);
+        rotateAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                final float rotateOffset = (float) animation.getAnimatedValue();
+                rotateByValue(rotateOffset, reverse);
+            }
+        });
+    }
+
+    private void updateColors() {
+        mainTeethPaint.setColor(mainColor);
+        mainCirclePaint.setColor(mainColor);
+        innerCirclePaint.setColor(innerColor);
     }
 
     public void setRotateOffset(float rotateOffset) {
         this.rotateOffset = rotateOffset;
     }
 
+    public void rotateByValue(float rotateOffset, boolean reverse) {
+        if (reverse)
+            rotateOffset = 360f - rotateOffset;
+        ViewCompat.setRotation(this, rotateOffset);
+    }
+
 
     private void drawTeeth() {
-        initAndConfigTools();
+        updateColors();
         teeth = Bitmap.createBitmap(mainDiameter, mainDiameter, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(teeth);
 

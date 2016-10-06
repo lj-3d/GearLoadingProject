@@ -193,6 +193,12 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
     public void start() {
     }
 
+    public void stop() {
+    }
+
+    public void rotateByValue(float rotateOffset) {
+    }
+
     public boolean isDialogShown() {
         return isDialogShown;
     }

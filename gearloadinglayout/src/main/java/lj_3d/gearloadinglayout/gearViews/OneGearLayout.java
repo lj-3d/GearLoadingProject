@@ -50,6 +50,14 @@ public class OneGearLayout extends GearLoadingLayout {
         mFirstGearView.startSpinning(false);
     }
 
+    public void stop() {
+        mFirstGearView.stopSpinning();
+    }
+
+    public void rotateByValue(float rotateOffset) {
+        mFirstGearView.rotateByValue(rotateOffset, false);
+    }
+
 
     public OneGearLayout setDuration(final int duration) {
         mFirstGearView.setDuration(duration);

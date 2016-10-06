@@ -58,6 +58,18 @@ public class ThreeGearsLayout extends GearLoadingLayout {
         mThirdGearView.startSpinning(false);
     }
 
+    public void stop() {
+        mFirstGearView.stopSpinning();
+        mSecondGearView.stopSpinning();
+        mThirdGearView.stopSpinning();
+    }
+
+    public void rotateByValue(float rotateOffset) {
+        mFirstGearView.rotateByValue(rotateOffset, false);
+        mSecondGearView.rotateByValue(rotateOffset, true);
+        mThirdGearView.rotateByValue(rotateOffset, false);
+    }
+
     public ThreeGearsLayout setDuration(final int duration) {
         mFirstGearView.setDuration(duration);
         mSecondGearView.setDuration(duration);

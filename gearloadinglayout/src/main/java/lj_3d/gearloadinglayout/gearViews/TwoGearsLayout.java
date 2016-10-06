@@ -53,6 +53,16 @@ public class TwoGearsLayout extends GearLoadingLayout {
         mSecondGearView.startSpinning(true);
     }
 
+    public void stop() {
+        mFirstGearView.stopSpinning();
+        mSecondGearView.stopSpinning();
+    }
+
+    public void rotateByValue(float rotateOffset) {
+        mFirstGearView.rotateByValue(rotateOffset, false);
+        mSecondGearView.rotateByValue(rotateOffset, true);
+    }
+
     public TwoGearsLayout setDuration(final int duration) {
         mFirstGearView.setDuration(duration);
         mSecondGearView.setDuration(duration);

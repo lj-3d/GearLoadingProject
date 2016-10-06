@@ -36,4 +36,9 @@
         <attr name="gearLayoutShadowWidth" format="dimension"/>
         <attr name="gearLayoutShadowColor" format="color"/>
     </declare-styleable>
+
+    <declare-styleable name="PullToRefreshLayout">
+        <attr name="closeDuration" format="integer"/>
+        <attr name="threshold" format="dimension"/>
+    </declare-styleable>
 </resources>
