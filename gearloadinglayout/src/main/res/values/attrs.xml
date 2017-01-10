@@ -38,7 +38,8 @@
     </declare-styleable>
 
     <declare-styleable name="PullToRefreshLayout">
-        <attr name="closeDuration" format="integer"/>
+        <attr name="fullExpandedCloseDuration" format="integer"/>
+        <attr name="nonFullExpandedCloseDuration" format="integer"/>
         <attr name="threshold" format="dimension"/>
     </declare-styleable>
 </resources>

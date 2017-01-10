@@ -3,8 +3,6 @@ package lj_3d.gearloadingproject;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.ViewGroup;
 
 import lj_3d.gearloadinglayout.gearViews.GearLoadingLayout;
 import lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout;
@@ -22,7 +20,7 @@ public class PullToRefreshActivity extends AppCompatActivity {
 
         final GearLoadingLayout gearLoadingLayout = (GearLoadingLayout) findViewById(R.id.gear_layout);
         final PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
-        pullToRefreshLayout.setCloseDuration(1000);
+        pullToRefreshLayout.setFullExpandedCloseDuration(1000);
         pullToRefreshLayout.setRefreshCallback(new PullToRefreshLayout.RefreshCallback() {
             @Override
             public void onRefresh() {

@@ -25,7 +25,8 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private boolean mIsRefreshing;
 
-    private int mCloseDuration;
+    private int mFullExpandedCloseDuration;
+    private int mNonFullExpandedCloseDuration;
     private int mThreshold;
 
     private float mStartYValue;
@@ -72,11 +73,14 @@ public class PullToRefreshLayout extends RelativeLayout {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
 
+                        if (mIsRefreshing) return false;
+
                         final float yAxis = event.getRawY();
 
                         switch (event.getAction()) {
                             case MotionEvent.ACTION_DOWN:
                                 onActionDown(yAxis);
+                                Log.d("ACTION_DOWN ", "child");
                                 break;
                             case MotionEvent.ACTION_UP:
                                 if (mStartYValue > yAxis || mInnerScrollValue > 0) {
@@ -85,7 +89,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                                     mLastYValue = mSecondChild.getTranslationY();
                                     return false;
                                 } else {
-                                    return PullToRefreshLayout.this.onTouchEvent(event);
+                                    return onTouchEvent(event);
                                 }
                             case MotionEvent.ACTION_MOVE:
                                 if (mStartYValue > yAxis || mInnerScrollValue > 0) {
@@ -98,7 +102,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                                         mStartYValue = mOverScrollDelta = yAxis - mLastYValue;
                                         mMaxYValue = mStartYValue + mThreshold;
                                     }
-                                    return PullToRefreshLayout.this.onTouchEvent(event);
+                                    return onTouchEvent(event);
                                 }
                         }
                         return false;
@@ -175,6 +179,7 @@ public class PullToRefreshLayout extends RelativeLayout {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 onActionDown(yAxis);
+                Log.d("ACTION_DOWN ", "parent");
                 break;
             case MotionEvent.ACTION_UP:
 //                if (mMaxYValue > 0) {
@@ -185,13 +190,12 @@ public class PullToRefreshLayout extends RelativeLayout {
 //                        Log.d("ACTION refresh", " " + yAxis);
 //                    }
 //                } else
-//                if (mStartYValue < yAxis) {
-//                    dragUpView(mThreshold - mDeltaYValue);
-//                    Log.d("ACTION drag", " " + yAxis);
-//                } else
-                if (mStartYValue > yAxis) {
+                if (mStartYValue < yAxis) {
+                    dragUpView(mThreshold - mDeltaYValue);
+                } else if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0);
                     mOverScrollDelta = 0f;
+                    Log.d("ACTION_UP", " reset");
                 }
                 mLastYValue = mSecondChild.getTranslationY();
                 mOverScrollDelta = 0f;
@@ -199,14 +203,17 @@ public class PullToRefreshLayout extends RelativeLayout {
             case MotionEvent.ACTION_MOVE:
                 if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0);
+                    Log.d("ACTION_MOVE", " reset");
                 } else {
                     dragView(minValue);
-//                        if (mRefreshCallback != null) {
-//                            mIsRefreshing = true;
-//                            mRefreshCallback.onRefresh();
-//                        } else
-//                            finishRefresh();
-//                    }
+                    if (minValue >= mMaxYValue) {
+                        Log.d("ACTION_MOVE", " mIsRefreshing set");
+                        if (mRefreshCallback != null) {
+                            mRefreshCallback.onRefresh();
+                        } else
+                            finishRefresh();
+                    }
+
                 }
                 break;
 
@@ -218,12 +225,13 @@ public class PullToRefreshLayout extends RelativeLayout {
         mDeltaYValue = (mMaxYValue - shiftOffset);
         final float offset = 1 - (mDeltaYValue / mThreshold);
         mSecondChild.setTranslationY(mThreshold * offset);
+        mIsRefreshing = shiftOffset >= mMaxYValue;
         if (mRefreshCallback != null)
             mRefreshCallback.onDrag(offset);
     }
 
     private void dragUpView(final float from) {
-        mBackDragger.setDuration(mCloseDuration);
+        mBackDragger.setDuration(isRefreshing() ? mFullExpandedCloseDuration : mNonFullExpandedCloseDuration);
         mBackDragger.setFloatValues(from, 0f);
         mBackDragger.start();
     }
@@ -259,7 +267,6 @@ public class PullToRefreshLayout extends RelativeLayout {
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 if (mRefreshCallback != null)
                     mRefreshCallback.onDrag(valueAnimator.getAnimatedFraction());
-                setEnabled(false);
                 final float delta = (float) valueAnimator.getAnimatedValue();
                 mSecondChild.setTranslationY(delta);
             }
@@ -271,12 +278,13 @@ public class PullToRefreshLayout extends RelativeLayout {
     }
 
     private void reset() {
-        setEnabled(true);
         mIsRefreshing = false;
         mStartYValue = 0f;
         mDeltaYValue = 0f;
         mMaxYValue = 0f;
         mLastYValue = 0f;
+        mInnerScrollValue = 0f;
+        mOverScrollDelta = 0f;
     }
 
     public void setRefreshCallback(RefreshCallback refreshCallback) {
@@ -299,8 +307,12 @@ public class PullToRefreshLayout extends RelativeLayout {
         mThreshold = threshold;
     }
 
-    public void setCloseDuration(int closeDuration) {
-        this.mCloseDuration = closeDuration;
+    public void setFullExpandedCloseDuration(int fullExpandedCloseDuration) {
+        this.mFullExpandedCloseDuration = fullExpandedCloseDuration;
+    }
+
+    public void setNonFullExpandedCloseDuration(int nonFullExpandedCloseDuration) {
+        this.mNonFullExpandedCloseDuration = nonFullExpandedCloseDuration;
     }
 
     public boolean isRefreshing() {
@@ -309,7 +321,8 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void parseAttributes(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PullToRefreshLayout);
-        setCloseDuration(a.getInteger(R.styleable.PullToRefreshLayout_closeDuration, 300));
+        setFullExpandedCloseDuration(a.getInteger(R.styleable.PullToRefreshLayout_fullExpandedCloseDuration, 300));
+        setNonFullExpandedCloseDuration(a.getInteger(R.styleable.PullToRefreshLayout_nonFullExpandedCloseDuration, 200));
         setThreshold(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_threshold, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_threshold)));
         requestLayout();
         a.recycle();
