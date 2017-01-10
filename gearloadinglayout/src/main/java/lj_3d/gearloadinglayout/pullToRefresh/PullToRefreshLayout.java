@@ -23,26 +23,25 @@ import lj_3d.gearloadinglayout.enums.ScrollableViewType;
 
 public class PullToRefreshLayout extends RelativeLayout {
 
-    private int mCloseDuration;
     private boolean mIsRefreshing;
 
+    private int mCloseDuration;
     private int mThreshold;
-    private float mStartYPosition;
-    private float mYDeltaPosition;
 
+    private float mStartYValue;
+    private float mDeltaYValue;
     private float mMaxYValue;
-    private View mFirstChild;
+    private float mLastYValue;
+    private float mInnerScrollValue;
+    private float mOverScrollDelta;
 
+    private View mFirstChild;
     private View mSecondChild;
     private View mScrollableView;
-    private final ValueAnimator mBackDragger = new ValueAnimator();
 
+    private final ValueAnimator mBackDragger = new ValueAnimator();
     private RefreshCallback mRefreshCallback;
     private ScrollableViewType mScrollableViewType;
-
-    private float mIsInnerScroll;
-    private float mOverScrollDelta;
-    private float mLastYPosition;
 
 
     public PullToRefreshLayout(Context context) {
@@ -77,34 +76,27 @@ public class PullToRefreshLayout extends RelativeLayout {
 
                         switch (event.getAction()) {
                             case MotionEvent.ACTION_DOWN:
-                                mStartYPosition = yAxis - mLastYPosition;
-                                Log.d("ACTION_DOWN_startPosition ", " "+ mStartYPosition);
-                                mMaxYValue = mStartYPosition + mThreshold;
-                                Log.d("ACTION_DOWN child", " " + yAxis);
-
-                                mOverScrollDelta = 0f;
+                                onActionDown(yAxis);
                                 break;
                             case MotionEvent.ACTION_UP:
-                                Log.d("ACTION_UP child", " " + yAxis);
-                                if (mStartYPosition > yAxis || mIsInnerScroll > 0) {
-                                    Log.d("ACTION_UP simple action", " " + yAxis);
+                                if (mStartYValue > yAxis || mInnerScrollValue > 0) {
                                     mSecondChild.setTranslationY(0);
                                     mOverScrollDelta = 0f;
-                                    mLastYPosition = mSecondChild.getTranslationY();
+                                    mLastYValue = mSecondChild.getTranslationY();
                                     return false;
                                 } else {
-                                    Log.d("ACTION_UP super action", " " + yAxis);
                                     return PullToRefreshLayout.this.onTouchEvent(event);
                                 }
                             case MotionEvent.ACTION_MOVE:
-                                Log.d("ACTION_MOVE child", yAxis + " " + mStartYPosition);
-                                if (mStartYPosition > yAxis || mIsInnerScroll > 0) {
+                                if (mStartYValue > yAxis || mInnerScrollValue > 0) {
                                     mSecondChild.setTranslationY(0);
+                                    mOverScrollDelta = 0f;
                                     return false;
                                 } else {
-                                    if (mOverScrollDelta == 0) { // need get overscroll offset from scrollable views
-                                        mStartYPosition = mOverScrollDelta = yAxis;
-                                        mMaxYValue = mStartYPosition + mThreshold;
+                                    if (mOverScrollDelta == 0f) { // need get overscroll offset from scrollable views
+                                        mLastYValue = mSecondChild.getTranslationY();
+                                        mStartYValue = mOverScrollDelta = yAxis - mLastYValue;
+                                        mMaxYValue = mStartYValue + mThreshold;
                                     }
                                     return PullToRefreshLayout.this.onTouchEvent(event);
                                 }
@@ -159,10 +151,9 @@ public class PullToRefreshLayout extends RelativeLayout {
         mScrollableView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
-                Log.d("scrollView onScroll", mScrollableView.getScrollY() + "");
-                mIsInnerScroll = mScrollableView.getScrollY();
-                if (mIsInnerScroll < 0) {
-                    mIsInnerScroll = 0;
+                mInnerScrollValue = mScrollableView.getScrollY();
+                if (mInnerScrollValue < 0) {
+                    mInnerScrollValue = 0f;
                 }
             }
         });
@@ -172,28 +163,20 @@ public class PullToRefreshLayout extends RelativeLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        final float xAxis = event.getRawX();
         final float yAxis = event.getRawY() < mOverScrollDelta ? event.getRawY() + mOverScrollDelta : event.getRawY();
-        Log.d("overScroll parent", yAxis + " " + mOverScrollDelta);
 
 
-        if (mFirstChild == null || mSecondChild == null || mIsRefreshing) { //|| mYDeltaPosition >= mThreshold
-            Log.d("ACTION block", (mFirstChild == null) + " " + (mSecondChild == null) + " " + (mYDeltaPosition >= mThreshold) + " " + mIsRefreshing);
+        if (mFirstChild == null || mSecondChild == null || mIsRefreshing) { //|| mDeltaYValue >= mThreshold
             return super.onTouchEvent(event);
         }
 
-        Log.d("ACTION_sLastYPosition", " " + mLastYPosition);
-        final float minValue = Math.min(yAxis + mLastYPosition, Math.min(yAxis + mLastYPosition, mMaxYValue + mLastYPosition));
+        final float minValue = Math.min(yAxis, Math.min(yAxis, mMaxYValue));
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Log.d("ACTION_DOWN  parent", " " + yAxis);
-                mStartYPosition = yAxis - mLastYPosition;
-                mMaxYValue = mStartYPosition + mThreshold;
-                mOverScrollDelta = 0f;
+                onActionDown(yAxis);
                 break;
             case MotionEvent.ACTION_UP:
-                Log.d("ACTION_UP  parent", " " + yAxis);
 //                if (mMaxYValue > 0) {
 //                    dragView(mMaxYValue);
 //                    if (mRefreshCallback != null) {
@@ -202,28 +185,22 @@ public class PullToRefreshLayout extends RelativeLayout {
 //                        Log.d("ACTION refresh", " " + yAxis);
 //                    }
 //                } else
-//                if (mStartYPosition < yAxis) {
-//                    dragUpView(mThreshold - mYDeltaPosition);
+//                if (mStartYValue < yAxis) {
+//                    dragUpView(mThreshold - mDeltaYValue);
 //                    Log.d("ACTION drag", " " + yAxis);
 //                } else
-                if (mStartYPosition > yAxis) {
+                if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0);
-                    Log.d("ACTION_UP  parent", " " + yAxis);
+                    mOverScrollDelta = 0f;
                 }
-                mLastYPosition = mSecondChild.getTranslationY();
+                mLastYValue = mSecondChild.getTranslationY();
                 mOverScrollDelta = 0f;
                 break;
             case MotionEvent.ACTION_MOVE:
-                Log.d("ACTION_MOVE  parent", minValue + " " + mMaxYValue + " " + mStartYPosition);
-                if (mStartYPosition > yAxis) {
+                if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0);
                 } else {
-                    Log.d("ACTION_stop", minValue + " " + mMaxYValue);
-                    if (minValue < mMaxYValue)
-                        dragView(minValue);
-                    else if (mMaxYValue > 0) {
-                        dragView(mMaxYValue);
-                    }
+                    dragView(minValue);
 //                        if (mRefreshCallback != null) {
 //                            mIsRefreshing = true;
 //                            mRefreshCallback.onRefresh();
@@ -238,9 +215,8 @@ public class PullToRefreshLayout extends RelativeLayout {
     }
 
     private void dragView(final float shiftOffset) {
-        mYDeltaPosition = (mMaxYValue - shiftOffset);
-        Log.d("dragView ", "mYDeltaPosition " + mYDeltaPosition);
-        final float offset = 1 - (mYDeltaPosition / mThreshold);
+        mDeltaYValue = (mMaxYValue - shiftOffset);
+        final float offset = 1 - (mDeltaYValue / mThreshold);
         mSecondChild.setTranslationY(mThreshold * offset);
         if (mRefreshCallback != null)
             mRefreshCallback.onDrag(offset);
@@ -297,10 +273,10 @@ public class PullToRefreshLayout extends RelativeLayout {
     private void reset() {
         setEnabled(true);
         mIsRefreshing = false;
-        mStartYPosition = 0f;
-        mYDeltaPosition = 0f;
+        mStartYValue = 0f;
+        mDeltaYValue = 0f;
         mMaxYValue = 0f;
-        mLastYPosition = 0f;
+        mLastYValue = 0f;
     }
 
     public void setRefreshCallback(RefreshCallback refreshCallback) {
@@ -339,5 +315,10 @@ public class PullToRefreshLayout extends RelativeLayout {
         a.recycle();
     }
 
+    private void onActionDown(final float yAxis) {
+        mStartYValue = yAxis - mLastYValue;
+        mMaxYValue = mStartYValue + mThreshold;
+        mOverScrollDelta = 0f;
+    }
 
 }
