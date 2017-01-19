@@ -36,6 +36,8 @@ public class PullToRefreshLayout extends RelativeLayout {
     private float mInnerScrollValue;
     private float mOverScrollDelta;
 
+    private float mRestoreValue;
+
     private View mFirstChild;
     private View mSecondChild;
     private View mScrollableView;
@@ -43,7 +45,6 @@ public class PullToRefreshLayout extends RelativeLayout {
     private final ValueAnimator mBackDragger = new ValueAnimator();
     private RefreshCallback mRefreshCallback;
     private ScrollableViewType mScrollableViewType;
-
 
     public PullToRefreshLayout(Context context) {
         this(context, null);
@@ -69,18 +70,23 @@ public class PullToRefreshLayout extends RelativeLayout {
 
                 checkIfScrollableElementPresentInChild(mSecondChild);
                 prepareActionForScrollableView();
+
                 mSecondChild.setOnTouchListener(new OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
 
-                        if (mIsRefreshing) return false;
-
                         final float yAxis = event.getRawY();
+
+                        if (mIsRefreshing) {
+                            if (event.getAction() == MotionEvent.ACTION_DOWN)
+                                mRestoreValue = yAxis;
+                            return false; // control for blocking content
+                        }
+
 
                         switch (event.getAction()) {
                             case MotionEvent.ACTION_DOWN:
                                 onActionDown(yAxis);
-                                Log.d("ACTION_DOWN ", "child");
                                 break;
                             case MotionEvent.ACTION_UP:
                                 if (mStartYValue > yAxis || mInnerScrollValue > 0) {
@@ -95,6 +101,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                                 if (mStartYValue > yAxis || mInnerScrollValue > 0) {
                                     mSecondChild.setTranslationY(0);
                                     mOverScrollDelta = 0f;
+                                    Log.d("inner_scroll", " " + mInnerScrollValue);
                                     return false;
                                 } else {
                                     if (mOverScrollDelta == 0f) { // need get overscroll offset from scrollable views
@@ -156,7 +163,7 @@ public class PullToRefreshLayout extends RelativeLayout {
             @Override
             public void onScrollChanged() {
                 mInnerScrollValue = mScrollableView.getScrollY();
-                if (mInnerScrollValue < 0) {
+                if (mInnerScrollValue < 0f) {
                     mInnerScrollValue = 0f;
                 }
             }
@@ -179,7 +186,6 @@ public class PullToRefreshLayout extends RelativeLayout {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 onActionDown(yAxis);
-                Log.d("ACTION_DOWN ", "parent");
                 break;
             case MotionEvent.ACTION_UP:
 //                if (mMaxYValue > 0) {
@@ -195,7 +201,6 @@ public class PullToRefreshLayout extends RelativeLayout {
                 } else if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0);
                     mOverScrollDelta = 0f;
-                    Log.d("ACTION_UP", " reset");
                 }
                 mLastYValue = mSecondChild.getTranslationY();
                 mOverScrollDelta = 0f;
@@ -203,11 +208,11 @@ public class PullToRefreshLayout extends RelativeLayout {
             case MotionEvent.ACTION_MOVE:
                 if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0);
-                    Log.d("ACTION_MOVE", " reset");
+//                    Log.d("ACTION_MOVE", " reset");
                 } else {
                     dragView(minValue);
                     if (minValue >= mMaxYValue) {
-                        Log.d("ACTION_MOVE", " mIsRefreshing set");
+//                        Log.d("ACTION_MOVE", " mIsRefreshing set");
                         if (mRefreshCallback != null) {
                             mRefreshCallback.onRefresh();
                         } else
@@ -283,8 +288,10 @@ public class PullToRefreshLayout extends RelativeLayout {
         mDeltaYValue = 0f;
         mMaxYValue = 0f;
         mLastYValue = 0f;
-        mInnerScrollValue = 0f;
+//        mInnerScrollValue = 0f;
         mOverScrollDelta = 0f;
+        mSecondChild.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, 0, mRestoreValue, 0, 0, 0, 0, 0, 0, 0));
+        mRestoreValue = 0f;
     }
 
     public void setRefreshCallback(RefreshCallback refreshCallback) {
