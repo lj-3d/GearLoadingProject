@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout
+        android:id="@+id/ptr_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <lj_3d.gearloadinglayout.gearViews.ThreeGearsLayout
+            android:id="@+id/gear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/pull_to_refresh_threshold"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include layout="@layout/activity_splash"/>
+
+            <TextView
+                style="@style/Devlight_txt"
+                android:text="@string/pull_down_to_refresh_title"/>
+        </FrameLayout>
+    </lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout>
+
+</FrameLayout>

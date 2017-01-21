@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout
+        android:id="@+id/ptr_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <lj_3d.gearloadinglayout.gearViews.ThreeGearsLayout
+            android:id="@+id/gear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/pull_to_refresh_threshold"/>
+
+
+        <ListView
+            android:id="@+id/lv_pull_to_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/main_color"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            tools:listitem="@layout/scrollable_item"/>
+    </lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout>
+</LinearLayout>
