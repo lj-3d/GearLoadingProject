@@ -16,7 +16,7 @@
             android:layout_height="@dimen/pull_to_refresh_threshold"/>
 
 
-        <ListView
+        <lj_3d.gearloadinglayout.pullToRefresh.ObservableListView
             android:id="@+id/lv_pull_to_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
