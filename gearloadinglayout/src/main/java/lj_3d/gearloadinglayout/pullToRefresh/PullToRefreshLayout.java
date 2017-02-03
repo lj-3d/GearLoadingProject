@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Rect;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -27,6 +29,7 @@ import lj_3d.gearloadinglayout.R;
 public class PullToRefreshLayout extends RelativeLayout {
 
     private boolean mIsRefreshing;
+    private boolean mInnerScrollEnabled;
 
     private int mFullExpandedCloseDuration;
     private int mNonFullExpandedCloseDuration;
@@ -36,17 +39,16 @@ public class PullToRefreshLayout extends RelativeLayout {
     private float mDeltaYValue;
     private float mMaxYValue;
     private float mLastYValue;
-    private float mInnerScrollValue;
     private float mOverScrollDelta;
 
     private float mRestoreValue;
+    private float mSecondChildTopOffset;
 
     private View mFirstChild;
     private View mSecondChild;
 
     private final ValueAnimator mBackDragger = new ValueAnimator();
     private RefreshCallback mRefreshCallback;
-    private Scroller mScroller;
 
     public PullToRefreshLayout(Context context) {
         this(context, null);
@@ -58,7 +60,6 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     public PullToRefreshLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mScroller = new Scroller(context);
         initDragger();
         parseAttributes(attrs);
     }
@@ -84,6 +85,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                         if (mIsRefreshing) {
                             if (event.getAction() == MotionEvent.ACTION_DOWN)
                                 mRestoreValue = yAxis;
+                            Log.d("mRestoreValue ", " mIsRefreshing " + mRestoreValue);
                             return false; // control for blocking content
                         }
                         switch (event.getAction()) {
@@ -93,7 +95,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                                 return false;
                             case MotionEvent.ACTION_UP:
                                 Log.d("onTouch_child_action ", " ACTION_UP");
-                                if (mStartYValue > yAxis || mInnerScrollValue > 0f) {
+                                if (mStartYValue > yAxis || mInnerScrollEnabled) {
                                     mSecondChild.setTranslationY(0f);
                                     mOverScrollDelta = 0f;
                                     mLastYValue = mSecondChild.getTranslationY();
@@ -103,7 +105,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                                 }
                             case MotionEvent.ACTION_MOVE:
                                 Log.d("onTouch_child_action ", " ACTION_MOVE");
-                                if (mStartYValue > yAxis || mInnerScrollValue > 0f) {
+                                if (mStartYValue > yAxis || mInnerScrollEnabled) {
                                     mSecondChild.setTranslationY(0f);
                                     mOverScrollDelta = 0f;
                                     return false;
@@ -151,7 +153,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                 public void onScroll(AbsListView listView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                     if (firstVisibleItem == 0 && listView != null && listView.getChildAt(0) != null) {
                         final int topPosition = listView.getChildAt(0).getTop();
-                        mInnerScrollValue = Math.abs(topPosition);
+                        mInnerScrollEnabled = Math.abs(topPosition) != 0;
                     }
                 }
             });
@@ -167,18 +169,32 @@ public class PullToRefreshLayout extends RelativeLayout {
                     super.onScrolled(recyclerView, dx, dy);
                     if (recyclerView != null && recyclerView.getChildAt(0) != null) {
                         final int topPosition = recyclerView.getChildAt(0).getTop();
-                        mInnerScrollValue = Math.abs(topPosition);
+                        mInnerScrollEnabled = Math.abs(topPosition) != 0;
                     }
+                }
+            });
+        } else if (mSecondChild instanceof NestedScrollView) {
+            mSecondChild.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    mSecondChildTopOffset = mSecondChild.getTop();
+                }
+            });
+            ((NestedScrollView) mSecondChild).setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+                @Override
+                public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                    if (mSecondChildTopOffset == 0) {
+                        mSecondChildTopOffset = mSecondChild.getTop();
+                    }
+                    Log.d("onScrollChange ", "scrollY " + scrollY + " mSecondChildTopOffset " + mSecondChildTopOffset);
+                    mInnerScrollEnabled = scrollY != 0f;
                 }
             });
         } else {
             mSecondChild.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
                 @Override
                 public void onScrollChanged() {
-                    mInnerScrollValue = mSecondChild.getScrollY();
-//                    if (mInnerScrollValue < 0f) {
-//                        mInnerScrollValue = 0f;
-//                    }
+                    mInnerScrollEnabled = mSecondChild.getScrollY() != 0f;
                 }
             });
         }
@@ -291,7 +307,13 @@ public class PullToRefreshLayout extends RelativeLayout {
         mMaxYValue = 0f;
         mLastYValue = 0f;
         mOverScrollDelta = 0f;
-        mSecondChild.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, 0, mRestoreValue, 0, 0, 0, 0, 0, 0, 0));
+        Log.d("mRestoreValue ", " reset " + mRestoreValue);
+        if (mSecondChild instanceof NestedScrollView) {
+//            ((NestedScrollView) mSecondChild).dispatchNestedPreScroll(0, (int) mRestoreValue, null, null);
+//            ((NestedScrollView) mSecondChild).dispatchNestedScroll(0, (int) mRestoreValue, 0, 0, null);
+            mSecondChild.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, 0, mRestoreValue - mSecondChildTopOffset, 0, 0, 0, 0, 0, 0, 0));
+        } else
+            mSecondChild.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, 0, mRestoreValue, 0, 0, 0, 0, 0, 0, 0));
         mRestoreValue = 0f;
     }
 
@@ -340,6 +362,12 @@ public class PullToRefreshLayout extends RelativeLayout {
         mStartYValue = yAxis - mLastYValue;
         mMaxYValue = mStartYValue + mThreshold;
         mOverScrollDelta = 0f;
+    }
+
+    private int getTopOffest(final View view) {
+        final Rect viewRect = new Rect();
+        view.getLocalVisibleRect(viewRect);
+        return view.getTop();
     }
 
 }

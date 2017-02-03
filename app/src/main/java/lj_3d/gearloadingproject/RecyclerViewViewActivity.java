@@ -26,6 +26,10 @@ public class RecyclerViewViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recycler_view);
 
+        initUI();
+    }
+
+    void initUI() {
         final RecyclerView pullToRefreshRecyclerView = (RecyclerView) findViewById(R.id.rv_pull_to_refresh);
         pullToRefreshRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         pullToRefreshRecyclerView.setAdapter(new PullToRefreshAdapter());
@@ -62,7 +66,7 @@ public class RecyclerViewViewActivity extends AppCompatActivity {
         });
     }
 
-    private class PullToRefreshAdapter extends RecyclerView.Adapter<PullToRefreshAdapter.ViewHolder> {
+    class PullToRefreshAdapter extends RecyclerView.Adapter<PullToRefreshAdapter.ViewHolder> {
 
 
         @Override

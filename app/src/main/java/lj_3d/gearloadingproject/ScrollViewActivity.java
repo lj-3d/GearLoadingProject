@@ -18,6 +18,10 @@ public class ScrollViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scroll_view);
 
+        initUI();
+    }
+
+    void initUI() {
         final GearLoadingLayout gearLoadingLayout = (GearLoadingLayout) findViewById(R.id.gear_layout);
         final PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
         pullToRefreshLayout.setFullExpandedCloseDuration(1000);
