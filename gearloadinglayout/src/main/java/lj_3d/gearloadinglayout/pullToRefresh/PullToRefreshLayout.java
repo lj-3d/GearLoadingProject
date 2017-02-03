@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
@@ -147,19 +148,27 @@ public class PullToRefreshLayout extends RelativeLayout {
                 }
 
                 @Override
-                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                    if (firstVisibleItem == 0 && view != null && view.getChildAt(0) != null) {
-                        final int topPosition = view.getChildAt(0).getTop();
-                        Log.d("firstVisibleItem ", " topPosition " + topPosition + " firstVisibleItem " + firstVisibleItem);
+                public void onScroll(AbsListView listView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    if (firstVisibleItem == 0 && listView != null && listView.getChildAt(0) != null) {
+                        final int topPosition = listView.getChildAt(0).getTop();
                         mInnerScrollValue = Math.abs(topPosition);
                     }
+                }
+            });
+        } else if (mSecondChild instanceof RecyclerView) {
+            ((RecyclerView) mSecondChild).addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
 
-////                    mScroller.startScroll();
-////                    if (mScroller.computeScrollOffset()) {
-//                    // Get current x and y positions
-//                    int currX = mScroller.getCurrX();
-//                    int currY = mScroller.getCurrY();
-//                    }
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (recyclerView != null && recyclerView.getChildAt(0) != null) {
+                        final int topPosition = recyclerView.getChildAt(0).getTop();
+                        mInnerScrollValue = Math.abs(topPosition);
+                    }
                 }
             });
         } else {
@@ -167,9 +176,9 @@ public class PullToRefreshLayout extends RelativeLayout {
                 @Override
                 public void onScrollChanged() {
                     mInnerScrollValue = mSecondChild.getScrollY();
-                    if (mInnerScrollValue < 0f) {
-                        mInnerScrollValue = 0f;
-                    }
+//                    if (mInnerScrollValue < 0f) {
+//                        mInnerScrollValue = 0f;
+//                    }
                 }
             });
         }
