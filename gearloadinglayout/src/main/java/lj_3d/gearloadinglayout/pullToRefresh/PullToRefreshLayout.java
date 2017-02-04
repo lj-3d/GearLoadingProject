@@ -81,16 +81,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                 mFirstChild.setEnabled(false);
                 mFirstChild.setFocusable(false);
                 mFirstChild.setFocusableInTouchMode(false);
-
-                // need to get top scrollable child top absolute position
-                // for restore scrollable state after finish refresh
-                getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        mSecondChildTopPosition = getTopPosition(mSecondChild);
-                    }
-                });
-
+                
                 // set touch listener to child to obtain y coordinates and motion events
                 mSecondChild.setOnTouchListener(new OnTouchListener() {
                     @Override
@@ -142,6 +133,14 @@ public class PullToRefreshLayout extends RelativeLayout {
     }
 
     private void prepareActionForScrollableView() {
+        // need to get top scrollable child top absolute position
+        // for restore scrollable state after finish refresh
+        mSecondChild.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mSecondChildTopPosition = getTopPosition(mSecondChild);
+            }
+        });
         if (mSecondChild instanceof ListView) {
             ((ListView) mSecondChild).setOnScrollListener(new AbsListView.OnScrollListener() {
                 @Override
