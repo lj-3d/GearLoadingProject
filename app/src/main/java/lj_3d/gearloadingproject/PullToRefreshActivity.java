@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import lj_3d.gearloadinglayout.gearViews.GearLoadingLayout;
 import lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout;
+import lj_3d.gearloadinglayout.pullToRefresh.RefreshCallback;
 
 /**
  * Created by liubomyr on 06.10.16.
@@ -21,7 +22,7 @@ public class PullToRefreshActivity extends AppCompatActivity {
         final GearLoadingLayout gearLoadingLayout = (GearLoadingLayout) findViewById(R.id.gear_layout);
         final PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
         pullToRefreshLayout.setFullExpandedCloseDuration(1000);
-        pullToRefreshLayout.setRefreshCallback(new PullToRefreshLayout.RefreshCallback() {
+        pullToRefreshLayout.setRefreshCallback(new RefreshCallback() {
             @Override
             public void onRefresh() {
                 gearLoadingLayout.start();

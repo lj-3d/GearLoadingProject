@@ -9,10 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.List;
-
 import lj_3d.gearloadinglayout.gearViews.GearLoadingLayout;
 import lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout;
+import lj_3d.gearloadinglayout.pullToRefresh.RefreshCallback;
 
 /**
  * Created by liubomyr on 06.10.16.
@@ -71,7 +70,7 @@ public class ListViewViewActivity extends AppCompatActivity {
         final GearLoadingLayout gearLoadingLayout = (GearLoadingLayout) findViewById(R.id.gear_layout);
         final PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
         pullToRefreshLayout.setFullExpandedCloseDuration(1000);
-        pullToRefreshLayout.setRefreshCallback(new PullToRefreshLayout.RefreshCallback() {
+        pullToRefreshLayout.setRefreshCallback(new RefreshCallback() {
             @Override
             public void onRefresh() {
                 gearLoadingLayout.start();
