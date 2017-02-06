@@ -17,7 +17,7 @@ import lj_3d.gearloadinglayout.pullToRefresh.RefreshCallback;
  * Created by liubomyr on 06.10.16.
  */
 
-public class ListViewViewActivity extends AppCompatActivity {
+public class ListViewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

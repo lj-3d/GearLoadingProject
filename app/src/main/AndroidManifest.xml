@@ -8,13 +8,32 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NestedScrollViewActivity">
+        <activity android:name=".PullToRefreshActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ListViewActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".NestedScrollViewActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ScrollViewActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".RecyclerViewActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".SplashActivity"
+            android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>

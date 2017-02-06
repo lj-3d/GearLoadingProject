@@ -17,7 +17,7 @@ import lj_3d.gearloadinglayout.pullToRefresh.RefreshCallback;
  * Created by liubomyr on 06.10.16.
  */
 
-public class RecyclerViewViewActivity extends AppCompatActivity {
+public class RecyclerViewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +69,7 @@ public class RecyclerViewViewActivity extends AppCompatActivity {
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            final View item = LayoutInflater.from(RecyclerViewViewActivity.this).inflate(R.layout.scrollable_item, null);
+            final View item = LayoutInflater.from(RecyclerViewActivity.this).inflate(R.layout.scrollable_item, null);
             return new ViewHolder(item);
         }
 

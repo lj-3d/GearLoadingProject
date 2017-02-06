@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_simple_layout"
+        style="@style/Devlight_button"
+        android:text="Simple Layout"/>
+
+    <Button
+        android:id="@+id/btn_scroll_view"
+        style="@style/Devlight_button"
+        android:text="ScrollView"/>
+
+    <Button
+        android:id="@+id/btn_nested_scroll_view"
+        style="@style/Devlight_button"
+        android:text="Nested ScrollView"/>
+
+    <Button
+        android:id="@+id/btn_list_view"
+        style="@style/Devlight_button"
+        android:text="ListView"/>
+
+    <Button
+        android:id="@+id/btn_recycler_view"
+        style="@style/Devlight_button"
+        android:text="RecyclerView"/>
+
+    <Button
+        android:id="@+id/btn_web_view"
+        style="@style/Devlight_button"
+        android:text="WebView"/>
+
+</LinearLayout>
