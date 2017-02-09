@@ -34,34 +34,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
 
         final GearLoadingLayout gearLoadingLayout = (GearLoadingLayout) findViewById(R.id.gear_layout);
         final PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
-        pullToRefreshLayout.setFullExpandedCloseDuration(1000);
-        pullToRefreshLayout.setRefreshCallback(new RefreshCallback() {
-            @Override
-            public void onRefresh() {
-                gearLoadingLayout.start();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        pullToRefreshLayout.finishRefresh();
-                    }
-                }, 2000);
-            }
-
-            @Override
-            public void onDrag(float offset) {
-                gearLoadingLayout.rotateByValue(360f * offset);
-            }
-
-            @Override
-            public void onStartClose() {
-
-            }
-
-            @Override
-            public void onFinishClose() {
-                gearLoadingLayout.stop();
-            }
-        });
+        PullToRefreshConfigurator.setupPullToRefresh(pullToRefreshLayout, gearLoadingLayout);
     }
 
     class PullToRefreshAdapter extends RecyclerView.Adapter<PullToRefreshAdapter.ViewHolder> {
