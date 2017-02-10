@@ -17,7 +17,7 @@ public class PullToRefreshConfigurator {
         pullToRefreshLayout.setRefreshCallback(new RefreshCallback() {
             @Override
             public void onRefresh() {
-//                gearLoadingLayout.start();
+                gearLoadingLayout.start();
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -28,7 +28,7 @@ public class PullToRefreshConfigurator {
 
             @Override
             public void onDrag(float offset) {
-//                gearLoadingLayout.rotateByValue(360f * offset);
+                gearLoadingLayout.rotateByValue(360f * offset);
             }
 
             @Override

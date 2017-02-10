@@ -86,6 +86,7 @@ public class CutOutLayout extends View {
         initTools();
         parseAttributes(attrs);
         shadowPaint.setMaskFilter(new BlurMaskFilter(shadowWidth, BlurMaskFilter.Blur.NORMAL));
+        setLayerType(LAYER_TYPE_HARDWARE, null);
     }
 
 

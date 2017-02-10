@@ -15,12 +15,34 @@
             android:layout_height="@dimen/pull_to_refresh_threshold"/>
 
 
-            <ScrollView
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <include layout="@layout/scroll_view_container"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-            </ScrollView>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <include layout="@layout/scroll_view_container"/>
+
+                        </ScrollView>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
     </lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout>
 </LinearLayout>

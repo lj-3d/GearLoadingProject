@@ -11,10 +11,13 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.webkit.WebView;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 import lj_3d.gearloadinglayout.R;
 
@@ -26,6 +29,7 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private boolean mIsRefreshing;
     private boolean mInnerScrollEnabled;
+    private boolean mIsScrollableViewEnabled;
 
     private int mThreshold;
     private int mSecondChildTopPosition;
@@ -76,12 +80,12 @@ public class PullToRefreshLayout extends RelativeLayout {
                 mFirstChild = getChildAt(0);
                 mSecondChild = getChildAt(1);
 
-                prepareActionForScrollableView();
+                prepareActionForScrollableView(getScrollableView(mSecondChild));
 
                 mFirstChild.setEnabled(false);
                 mFirstChild.setFocusable(false);
                 mFirstChild.setFocusableInTouchMode(false);
-                
+
                 // set touch listener to child to obtain y coordinates and motion events
                 mSecondChild.setOnTouchListener(new OnTouchListener() {
                     @Override
@@ -94,7 +98,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                         if (mIsRefreshing) {
                             if (event.getAction() == MotionEvent.ACTION_DOWN)
                                 mRestoreYValue = yAxis;
-                            return false; // control for blocking content
+                            return true; // control for blocking content
                         }
                         switch (event.getAction()) {
                             case MotionEvent.ACTION_DOWN:
@@ -102,7 +106,6 @@ public class PullToRefreshLayout extends RelativeLayout {
                                 return false;
                             case MotionEvent.ACTION_UP:
                                 if (mStartYValue > yAxis || mInnerScrollEnabled) {
-                                    mSecondChild.setTranslationY(0f);
                                     mOverScrollDelta = 0f;
                                     mLastYValue = mSecondChild.getTranslationY();
                                     return false;
@@ -132,17 +135,33 @@ public class PullToRefreshLayout extends RelativeLayout {
         }
     }
 
-    private void prepareActionForScrollableView() {
+    private View getScrollableView(final View secondChild) {
+        if (secondChild instanceof AbsListView ||
+                secondChild instanceof RecyclerView ||
+                secondChild instanceof ScrollView ||
+                secondChild instanceof WebView ||
+                secondChild instanceof NestedScrollView) {
+            mIsScrollableViewEnabled = true;
+            return secondChild;
+        } else if (secondChild instanceof ViewGroup && ((ViewGroup) secondChild).getChildCount() > 0) {
+//            for (int i = 0; i < ((ViewGroup) secondChild).getChildCount(); i++) {
+            getScrollableView(((ViewGroup) secondChild).getChildAt(0));
+//            }
+        }
+        return secondChild;
+    }
+
+    private void prepareActionForScrollableView(final View scrollableView) {
         // need to get top scrollable child top absolute position
         // for restore scrollable state after finish refresh
-        mSecondChild.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        scrollableView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 mSecondChildTopPosition = getTopPosition(mSecondChild);
             }
         });
-        if (mSecondChild instanceof ListView) {
-            ((ListView) mSecondChild).setOnScrollListener(new AbsListView.OnScrollListener() {
+        if (scrollableView instanceof AbsListView) {
+            ((AbsListView) scrollableView).setOnScrollListener(new AbsListView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(AbsListView listView, int scrollState) {
                     if (mOnListViewScrollListener != null)
@@ -160,8 +179,8 @@ public class PullToRefreshLayout extends RelativeLayout {
                     }
                 }
             });
-        } else if (mSecondChild instanceof RecyclerView) {
-            ((RecyclerView) mSecondChild).addOnScrollListener(new RecyclerView.OnScrollListener() {
+        } else if (scrollableView instanceof RecyclerView) {
+            ((RecyclerView) scrollableView).addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
@@ -176,8 +195,8 @@ public class PullToRefreshLayout extends RelativeLayout {
                     }
                 }
             });
-        } else if (mSecondChild instanceof NestedScrollView) {
-            ((NestedScrollView) mSecondChild).setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+        } else if (scrollableView instanceof NestedScrollView) {
+            ((NestedScrollView) scrollableView).setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
                 @Override
                 public void onScrollChange(NestedScrollView nestedScrollView, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                     if (mOnNestedScrollViewScrollListener != null)
@@ -186,10 +205,10 @@ public class PullToRefreshLayout extends RelativeLayout {
                 }
             });
         } else {
-            mSecondChild.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            scrollableView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
                 @Override
                 public void onScrollChanged() {
-                    mInnerScrollEnabled = mSecondChild.getScrollY() != 0f;
+                    mInnerScrollEnabled = scrollableView.getScrollY() != 0f;
                 }
             });
         }

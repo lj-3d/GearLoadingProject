@@ -34,7 +34,7 @@ public class GearView extends View {
 
     private Path path;
 
-    private ObjectAnimator rotateAnimation = new ObjectAnimator();
+    private ValueAnimator rotateAnimation = new ValueAnimator();
 
     private final PorterDuffXfermode mPorterDuffXfermode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
 
@@ -69,6 +69,7 @@ public class GearView extends View {
         super(context, attrs, defStyleAttr);
         initBaseTools();
         parseAttributes(attrs);
+        setLayerType(LAYER_TYPE_HARDWARE, null);
     }
 
     @Override

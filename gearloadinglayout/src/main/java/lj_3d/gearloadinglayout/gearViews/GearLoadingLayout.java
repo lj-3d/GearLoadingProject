@@ -73,6 +73,7 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
         mMainBackground = (FrameLayout) rootView.findViewById(R.id.main_background);
         mCutOutLayout = (CutOutLayout) rootView.findViewById(R.id.cut_out_layout);
         mMainWrapper.setOnClickListener(this);
+        setLayerType(LAYER_TYPE_HARDWARE, null);
     }
 
     @Override
