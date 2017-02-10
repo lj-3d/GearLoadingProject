@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pull_down_to_refresh_title">Pull down to Refresh \u2193\u2193\u2193</string>
+    <string name="title_activity_pull_to_refresh_header">PullToRefreshHeaderActivity</string>
 </resources>

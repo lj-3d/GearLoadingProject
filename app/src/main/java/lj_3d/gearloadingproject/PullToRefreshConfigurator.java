@@ -13,7 +13,7 @@ import lj_3d.gearloadinglayout.pullToRefresh.RefreshCallback;
 public class PullToRefreshConfigurator {
 
     public static void setupPullToRefresh(final PullToRefreshLayout pullToRefreshLayout, final GearLoadingLayout gearLoadingLayout) {
-        pullToRefreshLayout.setFullExpandedCloseDuration(3000);
+        pullToRefreshLayout.setFullExpandedCloseDuration(1000);
         pullToRefreshLayout.setRefreshCallback(new RefreshCallback() {
             @Override
             public void onRefresh() {

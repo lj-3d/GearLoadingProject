@@ -17,7 +17,7 @@ public class NestedScrollViewActivity extends ScrollViewActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nested_scroll_view);
-        super.initUI();
+        initHeaderUI();
     }
 
 }

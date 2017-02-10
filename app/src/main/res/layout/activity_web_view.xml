@@ -15,12 +15,11 @@
             android:layout_height="@dimen/pull_to_refresh_threshold"/>
 
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+        <WebView
+            android:id="@+id/wv_pull_to_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-                <include layout="@layout/scroll_view_container"/>
-
-            </ScrollView>
+        </WebView>
     </lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout>
 </LinearLayout>

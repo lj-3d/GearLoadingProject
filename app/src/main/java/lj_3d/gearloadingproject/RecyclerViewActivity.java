@@ -17,13 +17,13 @@ import lj_3d.gearloadinglayout.pullToRefresh.RefreshCallback;
  * Created by liubomyr on 06.10.16.
  */
 
-public class RecyclerViewActivity extends AppCompatActivity {
+public class RecyclerViewActivity extends PullToRefreshHeaderActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recycler_view);
-
+        initHeaderUI();
         initUI();
     }
 
@@ -31,10 +31,6 @@ public class RecyclerViewActivity extends AppCompatActivity {
         final RecyclerView pullToRefreshRecyclerView = (RecyclerView) findViewById(R.id.rv_pull_to_refresh);
         pullToRefreshRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         pullToRefreshRecyclerView.setAdapter(new PullToRefreshAdapter());
-
-        final GearLoadingLayout gearLoadingLayout = (GearLoadingLayout) findViewById(R.id.gear_layout);
-        final PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
-        PullToRefreshConfigurator.setupPullToRefresh(pullToRefreshLayout, gearLoadingLayout);
     }
 
     class PullToRefreshAdapter extends RecyclerView.Adapter<PullToRefreshAdapter.ViewHolder> {

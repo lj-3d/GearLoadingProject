@@ -25,6 +25,11 @@
         android:text="ListView"/>
 
     <Button
+        android:id="@+id/btn_grid_view"
+        style="@style/Devlight_button"
+        android:text="GridView"/>
+
+    <Button
         android:id="@+id/btn_recycler_view"
         style="@style/Devlight_button"
         android:text="RecyclerView"/>

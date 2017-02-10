@@ -1,32 +1,30 @@
 package lj_3d.gearloadingproject;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
+import android.widget.GridView;
 import android.widget.TextView;
 
 import lj_3d.gearloadinglayout.gearViews.GearLoadingLayout;
 import lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout;
-import lj_3d.gearloadinglayout.pullToRefresh.RefreshCallback;
 
 /**
  * Created by liubomyr on 06.10.16.
  */
 
-public class ListViewActivity extends PullToRefreshHeaderActivity {
+public class GridViewActivity extends PullToRefreshHeaderActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_view);
+        setContentView(R.layout.activity_grid_view);
         initHeaderUI();
 
-        final ListView pullToRefreshListView = (ListView) findViewById(R.id.lv_pull_to_refresh);
-        pullToRefreshListView.setAdapter(new BaseAdapter() {
+        final GridView pullToRefreshGridView = (GridView) findViewById(R.id.gv_pull_to_refresh);
+        pullToRefreshGridView.setAdapter(new BaseAdapter() {
             @Override
             public int getCount() {
                 return 100;

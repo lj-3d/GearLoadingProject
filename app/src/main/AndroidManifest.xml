@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="lj_3d.gearloadingproject">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -33,7 +36,16 @@
         <activity
             android:name=".SplashActivity"
             android:screenOrientation="portrait"/>
-
+        <activity
+            android:name=".GridViewActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".WebViewActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".PullToRefreshHeaderActivity"
+            android:label="@string/title_activity_pull_to_refresh_header">
+        </activity>
     </application>
 
 </manifest>

@@ -27,6 +27,7 @@ public class PullToRefreshActivity extends AppCompatActivity implements View.OnC
         final View scrollView = findViewById(R.id.btn_scroll_view);
         final View nestedScrollView = findViewById(R.id.btn_nested_scroll_view);
         final View listView = findViewById(R.id.btn_list_view);
+        final View gridView = findViewById(R.id.btn_grid_view);
         final View recyclerView = findViewById(R.id.btn_recycler_view);
         final View webView = findViewById(R.id.btn_web_view);
 
@@ -34,6 +35,7 @@ public class PullToRefreshActivity extends AppCompatActivity implements View.OnC
         scrollView.setOnClickListener(this);
         nestedScrollView.setOnClickListener(this);
         listView.setOnClickListener(this);
+        gridView.setOnClickListener(this);
         recyclerView.setOnClickListener(this);
         webView.setOnClickListener(this);
     }
@@ -51,11 +53,15 @@ public class PullToRefreshActivity extends AppCompatActivity implements View.OnC
             case R.id.btn_list_view:
                 clazz = ListViewActivity.class;
                 break;
+            case R.id.btn_grid_view:
+                clazz = GridViewActivity.class;
+                break;
             case R.id.btn_recycler_view:
                 clazz = RecyclerViewActivity.class;
                 break;
-//            case R.id.btn_web_view:
-//                break;
+            case R.id.btn_web_view:
+                clazz = WebViewActivity.class;
+                break;
             default:
                 clazz = MainActivity.class;
                 break;
