@@ -13,11 +13,11 @@ import lj_3d.gearloadinglayout.pullToRefresh.RefreshCallback;
 public class PullToRefreshConfigurator {
 
     public static void setupPullToRefresh(final PullToRefreshLayout pullToRefreshLayout, final GearLoadingLayout gearLoadingLayout) {
-        pullToRefreshLayout.setFullExpandedCloseDuration(1000);
+        pullToRefreshLayout.setFullDragDuration(1000);
         pullToRefreshLayout.setRefreshCallback(new RefreshCallback() {
             @Override
             public void onRefresh() {
-                gearLoadingLayout.start();
+                gearLoadingLayout.start(true);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -32,6 +32,16 @@ public class PullToRefreshConfigurator {
             }
 
             @Override
+            public void onTension(float offset) {
+                gearLoadingLayout.rotateByValue(-360f * (offset * 0.07f));
+            }
+
+            @Override
+            public void onBackDrag(float offset) {
+                gearLoadingLayout.rotateByValue(-360f * offset);
+            }
+
+            @Override
             public void onStartClose() {
 
             }
@@ -39,6 +49,10 @@ public class PullToRefreshConfigurator {
             @Override
             public void onFinishClose() {
                 gearLoadingLayout.stop();
+            }
+
+            @Override
+            public void onTensionComplete() {
             }
         });
     }

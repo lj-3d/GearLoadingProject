@@ -9,8 +9,14 @@ public interface RefreshCallback {
 
     void onDrag(float offset);
 
+    void onTension(float offset);
+
+    void onBackDrag(float offset);
+
     void onStartClose();
 
     void onFinishClose();
+
+    void onTensionComplete();
 
 }

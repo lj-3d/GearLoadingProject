@@ -38,8 +38,9 @@
     </declare-styleable>
 
     <declare-styleable name="PullToRefreshLayout">
-        <attr name="fullExpandedCloseDuration" format="integer"/>
-        <attr name="nonFullExpandedCloseDuration" format="integer"/>
+        <attr name="fullDragDuration" format="integer"/>
+        <attr name="cancelDragDuration" format="integer"/>
         <attr name="threshold" format="dimension"/>
+        <attr name="tension" format="dimension"/>
     </declare-styleable>
 </resources>

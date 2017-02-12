@@ -58,6 +58,16 @@ public class ThreeGearsLayout extends GearLoadingLayout {
         mThirdGearView.startSpinning(false);
     }
 
+    public void start(boolean reverseMode) {
+        if (reverseMode) {
+            mFirstGearView.startSpinning(true);
+            mSecondGearView.startSpinning(false);
+            mThirdGearView.startSpinning(true);
+        } else {
+            start();
+        }
+    }
+
     public void stop() {
         mFirstGearView.stopSpinning();
         mSecondGearView.stopSpinning();

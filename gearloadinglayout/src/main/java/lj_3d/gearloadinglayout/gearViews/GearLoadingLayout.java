@@ -194,6 +194,9 @@ public class GearLoadingLayout extends FrameLayout implements OnBlurCompleteInte
     public void start() {
     }
 
+    public void start(boolean reverse) {
+    }
+
     public void stop() {
     }
 

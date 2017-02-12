@@ -50,6 +50,10 @@ public class OneGearLayout extends GearLoadingLayout {
         mFirstGearView.startSpinning(false);
     }
 
+    public void start(boolean reverseMode) {
+        mFirstGearView.startSpinning(reverseMode);
+    }
+
     public void stop() {
         mFirstGearView.stopSpinning();
     }
