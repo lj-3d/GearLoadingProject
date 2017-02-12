@@ -30,4 +30,12 @@
         <item name="android:layout_height">5dp</item>
         <item name="android:background">@color/white</item>
     </style>
+
+    <style name="Devlight_gears_layout">
+        <item name="android:id">@id/gear_layout</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/pull_2_refresh_height</item>
+    </style>
+
+    <item name="gear_layout" type="id">gear_layout</item>
 </resources>

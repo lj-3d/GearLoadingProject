@@ -269,8 +269,15 @@ public class PullToRefreshLayout extends RelativeLayout {
         mDeltaYValue = (mMaxYValue - shiftOffset);
         final float offset = 1 - (mDeltaYValue / mTotalHeight);
         mSecondChild.setTranslationY(mTotalHeight * offset);
-        if (mRefreshCallback != null)
+        if (mRefreshCallback != null) {
             mRefreshCallback.onDrag(offset);
+            if (mTension != 0) {
+                if (mDeltaYValue <= mTension) {
+                    final float tensionFraction = 1 - (mDeltaYValue / mTension);
+                    mRefreshCallback.onTension(tensionFraction);
+                } else mRefreshCallback.onTension(0f);
+            }
+        }
     }
 
     private void dragUpView(final float from) {
@@ -345,7 +352,7 @@ public class PullToRefreshLayout extends RelativeLayout {
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 onBackDrag(valueAnimator);
                 if (mRefreshCallback != null)
-                    mRefreshCallback.onTension(valueAnimator.getAnimatedFraction());
+                    mRefreshCallback.onTensionUp(valueAnimator.getAnimatedFraction());
             }
         });
         tensionAnimator.start();

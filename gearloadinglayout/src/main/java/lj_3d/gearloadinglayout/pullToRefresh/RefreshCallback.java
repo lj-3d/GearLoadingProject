@@ -11,6 +11,8 @@ public interface RefreshCallback {
 
     void onTension(float offset);
 
+    void onTensionUp(float offset);
+
     void onBackDrag(float offset);
 
     void onStartClose();

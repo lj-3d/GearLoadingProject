@@ -26,9 +26,7 @@
             android:layout_height="300dp">
 
             <lj_3d.gearloadinglayout.gearViews.ThreeGearsLayout
-                android:id="@+id/gear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/pull_to_refresh_threshold"/>
+                style="@style/Devlight_gears_layout"/>
 
             <android.support.v4.widget.NestedScrollView
                 android:layout_width="match_parent"

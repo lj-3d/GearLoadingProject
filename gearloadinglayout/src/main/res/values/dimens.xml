@@ -17,7 +17,7 @@
 
     <dimen name="cut_layout_diameter">40dp</dimen>
     <dimen name="pull_to_refresh_threshold">120dp</dimen>
-    <dimen name="pull_to_refresh_tension">40dp</dimen>
+    <dimen name="pull_to_refresh_tension">30dp</dimen>
 
     <dimen name="three_gear_first_inner_diameter">9dp</dimen>
     <dimen name="three_gear_first_main_diameter">60dp</dimen>

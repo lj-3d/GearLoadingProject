@@ -1,6 +1,7 @@
 package lj_3d.gearloadingproject;
 
 import android.os.Handler;
+import android.util.Log;
 
 import lj_3d.gearloadinglayout.gearViews.GearLoadingLayout;
 import lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout;
@@ -33,6 +34,18 @@ public class PullToRefreshConfigurator {
 
             @Override
             public void onTension(float offset) {
+                Log.d("onTension ", "offset " + offset);
+                final float scaleValue = 0.1f * offset;
+                gearLoadingLayout.setScaleX(1 + scaleValue);
+                gearLoadingLayout.setScaleY(1 + scaleValue);
+            }
+
+            @Override
+            public void onTensionUp(float offset) {
+                Log.d("onTensionUp ", "offset " + offset);
+                final float scaleValue = 0.1f * offset;
+                gearLoadingLayout.setScaleX(1.1f - scaleValue);
+                gearLoadingLayout.setScaleY(1.1f - scaleValue);
                 gearLoadingLayout.rotateByValue(-360f * (offset * 0.07f));
             }
 
