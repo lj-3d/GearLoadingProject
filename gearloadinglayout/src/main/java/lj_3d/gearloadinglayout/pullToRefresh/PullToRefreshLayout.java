@@ -5,6 +5,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -45,6 +46,9 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private View mFirstChild;
     private View mSecondChild;
+    private View mViewScrollableViewToFind;
+
+    private MotionEvent mChildMotionEvent;
 
     private RefreshCallback mRefreshCallback;
     private OnChildTouchListener mOnChildTouchListener;
@@ -80,16 +84,21 @@ public class PullToRefreshLayout extends RelativeLayout {
                 mFirstChild = getChildAt(0);
                 mSecondChild = getChildAt(1);
 
-                prepareActionForScrollableView(getScrollableView(mSecondChild));
+                findScrollableView(mSecondChild);
+                if (mViewScrollableViewToFind == null)
+                    mViewScrollableViewToFind = mSecondChild;
+                prepareActionForScrollableView(mViewScrollableViewToFind);
 
                 mFirstChild.setEnabled(false);
                 mFirstChild.setFocusable(false);
                 mFirstChild.setFocusableInTouchMode(false);
 
                 // set touch listener to child to obtain y coordinates and motion events
-                mSecondChild.setOnTouchListener(new OnTouchListener() {
+                mViewScrollableViewToFind.setOnTouchListener(new OnTouchListener() {
                     @Override
                     public boolean onTouch(View view, MotionEvent event) {
+                        mChildMotionEvent = event;
+
                         if (mOnChildTouchListener != null)
                             mOnChildTouchListener.onTouch(view, event);
 
@@ -135,20 +144,19 @@ public class PullToRefreshLayout extends RelativeLayout {
         }
     }
 
-    private View getScrollableView(final View secondChild) {
+    private void findScrollableView(final View secondChild) {
         if (secondChild instanceof AbsListView ||
                 secondChild instanceof RecyclerView ||
                 secondChild instanceof ScrollView ||
                 secondChild instanceof WebView ||
                 secondChild instanceof NestedScrollView) {
-            mIsScrollableViewEnabled = true;
-            return secondChild;
-        } else if (secondChild instanceof ViewGroup && ((ViewGroup) secondChild).getChildCount() > 0) {
-//            for (int i = 0; i < ((ViewGroup) secondChild).getChildCount(); i++) {
-            getScrollableView(((ViewGroup) secondChild).getChildAt(0));
-//            }
+            mViewScrollableViewToFind = secondChild;
+        } else if (mViewScrollableViewToFind == null && secondChild instanceof ViewGroup && ((ViewGroup) secondChild).getChildCount() > 0) {
+            for (int i = 0; i < ((ViewGroup) secondChild).getChildCount(); i++) {
+                if (mViewScrollableViewToFind == null)
+                    findScrollableView(((ViewGroup) secondChild).getChildAt(i));
+            }
         }
-        return secondChild;
     }
 
     private void prepareActionForScrollableView(final View scrollableView) {
@@ -209,6 +217,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                 @Override
                 public void onScrollChanged() {
                     mInnerScrollEnabled = scrollableView.getScrollY() != 0f;
+                    Log.d("onScrollChanged ", " " + scrollableView.getScrollY());
                 }
             });
         }
@@ -232,7 +241,13 @@ public class PullToRefreshLayout extends RelativeLayout {
                 onActionDown(yAxis);
                 break;
             case MotionEvent.ACTION_UP:
-                if (mStartYValue < yAxis) {
+                if (minValue >= mMaxYValue) {
+                    mIsRefreshing = true;
+                    if (mRefreshCallback != null) {
+                        mRefreshCallback.onRefresh();
+                    } else
+                        finishRefresh();
+                } else if (mStartYValue < yAxis) {
                     dragUpView(mThreshold - mDeltaYValue);
                 } else if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0f);
@@ -246,12 +261,6 @@ public class PullToRefreshLayout extends RelativeLayout {
                     mSecondChild.setTranslationY(0);
                 } else {
                     dragView(minValue);
-                    if (minValue >= mMaxYValue) {
-                        if (mRefreshCallback != null) {
-                            mRefreshCallback.onRefresh();
-                        } else
-                            finishRefresh();
-                    }
                 }
                 break;
         }
@@ -262,7 +271,6 @@ public class PullToRefreshLayout extends RelativeLayout {
         mDeltaYValue = (mMaxYValue - shiftOffset);
         final float offset = 1 - (mDeltaYValue / mThreshold);
         mSecondChild.setTranslationY(mThreshold * offset);
-        mIsRefreshing = shiftOffset >= mMaxYValue;
         if (mRefreshCallback != null)
             mRefreshCallback.onDrag(offset);
     }
@@ -316,13 +324,15 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void reset() {
         mIsRefreshing = false;
-        mStartYValue = 0f;
-        mDeltaYValue = 0f;
-        mMaxYValue = 0f;
-        mLastYValue = 0f;
         mOverScrollDelta = 0f;
-        mSecondChild.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, 0, mRestoreYValue - mSecondChildTopPosition, 0, 0, 0, 0, 0, 0, 0));
-        mRestoreYValue = 0f;
+        if (mChildMotionEvent.getAction() != MotionEvent.ACTION_MOVE) {
+            mStartYValue = 0f;
+            mDeltaYValue = 0f;
+            mMaxYValue = 0f;
+            mLastYValue = 0f;
+            mSecondChild.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, 0, mRestoreYValue - mSecondChildTopPosition, 0, 0, 0, 0, 0, 0, 0));
+            mRestoreYValue = 0f;
+        }
     }
 
     public void setThreshold(int threshold) {
