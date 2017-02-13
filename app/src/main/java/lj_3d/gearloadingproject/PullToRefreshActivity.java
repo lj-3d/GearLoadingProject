@@ -2,15 +2,8 @@ package lj_3d.gearloadingproject;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.view.NestedScrollingChild;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-
-import lj_3d.gearloadinglayout.gearViews.GearLoadingLayout;
-import lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout;
-import lj_3d.gearloadinglayout.pullToRefresh.RefreshCallback;
 
 /**
  * Created by liubomyr on 06.10.16.

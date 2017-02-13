@@ -19,6 +19,11 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
 import lj_3d.gearloadinglayout.R;
+import lj_3d.gearloadinglayout.pullToRefresh.callbacks.OnChildTouchListener;
+import lj_3d.gearloadinglayout.pullToRefresh.callbacks.OnListViewScrollListener;
+import lj_3d.gearloadinglayout.pullToRefresh.callbacks.OnNestedScrollViewScrollListener;
+import lj_3d.gearloadinglayout.pullToRefresh.callbacks.OnPullToRefreshTouchEvent;
+import lj_3d.gearloadinglayout.pullToRefresh.callbacks.RefreshCallback;
 
 /**
  * Created by liubomyr on 04.10.16.
@@ -26,13 +31,15 @@ import lj_3d.gearloadinglayout.R;
 
 public class PullToRefreshLayout extends RelativeLayout {
 
+    private Mode mMode;
+
     private boolean mIsRefreshing;
     private boolean mInnerScrollEnabled;
-    private boolean mIsScrollableViewEnabled;
 
     private int mThreshold;
     private int mTension;
     private int mTotalHeight;
+    private int mFirstChildHeight;
     private int mSecondChildTopPosition;
     private int mFullDragDuration;
     private int mCancelDragDuration;
@@ -47,8 +54,6 @@ public class PullToRefreshLayout extends RelativeLayout {
     private View mFirstChild;
     private View mSecondChild;
     private View mViewScrollableViewToFind;
-
-    private MotionEvent mChildMotionEvent;
 
     private RefreshCallback mRefreshCallback;
     private OnChildTouchListener mOnChildTouchListener;
@@ -84,18 +89,17 @@ public class PullToRefreshLayout extends RelativeLayout {
                 findScrollableView(mSecondChild);
                 if (mViewScrollableViewToFind == null)
                     mViewScrollableViewToFind = mSecondChild;
-                prepareActionForScrollableView(mViewScrollableViewToFind);
+                prepareCallbacksForScrollableView(mViewScrollableViewToFind);
 
                 mFirstChild.setEnabled(false);
                 mFirstChild.setFocusable(false);
                 mFirstChild.setFocusableInTouchMode(false);
+                setupLayoutByMode(mMode);
 
                 // set touch listener to child to obtain y coordinates and motion events
                 mViewScrollableViewToFind.setOnTouchListener(new OnTouchListener() {
                     @Override
                     public boolean onTouch(View view, MotionEvent event) {
-                        mChildMotionEvent = event;
-
                         if (mOnChildTouchListener != null)
                             mOnChildTouchListener.onTouch(view, event);
 
@@ -156,7 +160,7 @@ public class PullToRefreshLayout extends RelativeLayout {
         }
     }
 
-    private void prepareActionForScrollableView(final View scrollableView) {
+    private void prepareCallbacksForScrollableView(final View scrollableView) {
         // need to get top scrollable child top absolute position
         // for restore scrollable state after finish refresh
         scrollableView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -267,13 +271,24 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void dragView(final float shiftOffset) {
         mDeltaYValue = (mMaxYValue - shiftOffset);
-        final float offset = 1 - (mDeltaYValue / mTotalHeight);
+        final float offset = 1f - (mDeltaYValue / mTotalHeight);
         mSecondChild.setTranslationY(mTotalHeight * offset);
+
+        if (mMode == Mode.DRAG) {
+            final float dragValue = (mDeltaYValue - mTension) / mThreshold;
+            if (mDeltaYValue >= mTension) {
+                mFirstChild.setTranslationY(-mFirstChildHeight * dragValue);
+            } else {
+                if (mFirstChild.getTranslationY() != 0f)
+                    mFirstChild.setTranslationY(0f);
+            }
+        }
+
         if (mRefreshCallback != null) {
             mRefreshCallback.onDrag(offset);
             if (mTension != 0) {
                 if (mDeltaYValue <= mTension) {
-                    final float tensionFraction = 1 - (mDeltaYValue / mTension);
+                    final float tensionFraction = 1f - (mDeltaYValue / mTension);
                     mRefreshCallback.onTension(tensionFraction);
                 } else mRefreshCallback.onTension(0f);
             }
@@ -313,8 +328,6 @@ public class PullToRefreshLayout extends RelativeLayout {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 onBackDrag(valueAnimator);
-                if (mRefreshCallback != null)
-                    mRefreshCallback.onBackDrag(valueAnimator.getAnimatedFraction());
             }
         });
         backDragAnimator.start();
@@ -350,9 +363,7 @@ public class PullToRefreshLayout extends RelativeLayout {
         tensionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                onBackDrag(valueAnimator);
-                if (mRefreshCallback != null)
-                    mRefreshCallback.onTensionUp(valueAnimator.getAnimatedFraction());
+                onBackTension(valueAnimator);
             }
         });
         tensionAnimator.start();
@@ -361,6 +372,18 @@ public class PullToRefreshLayout extends RelativeLayout {
     private void onBackDrag(final ValueAnimator valueAnimator) {
         final float delta = (float) valueAnimator.getAnimatedValue();
         mSecondChild.setTranslationY(delta);
+        if (mMode == Mode.DRAG) {
+            mFirstChild.setTranslationY(delta - mFirstChildHeight);
+        }
+        if (mRefreshCallback != null)
+            mRefreshCallback.onBackDrag(valueAnimator.getAnimatedFraction());
+    }
+
+    private void onBackTension(final ValueAnimator valueAnimator) {
+        final float delta = (float) valueAnimator.getAnimatedValue();
+        mSecondChild.setTranslationY(delta);
+        if (mRefreshCallback != null)
+            mRefreshCallback.onTensionUp(valueAnimator.getAnimatedFraction());
     }
 
     private void onRefresh() {
@@ -377,14 +400,12 @@ public class PullToRefreshLayout extends RelativeLayout {
     private void reset() {
         mIsRefreshing = false;
         mOverScrollDelta = 0f;
-        if (mChildMotionEvent.getAction() != MotionEvent.ACTION_MOVE) {
-            mStartYValue = 0f;
-            mDeltaYValue = 0f;
-            mMaxYValue = 0f;
-            mLastYValue = 0f;
-            mSecondChild.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, 0, mRestoreYValue - mSecondChildTopPosition, 0, 0, 0, 0, 0, 0, 0));
-            mRestoreYValue = 0f;
-        }
+        mStartYValue = 0f;
+        mDeltaYValue = 0f;
+        mMaxYValue = 0f;
+        mLastYValue = 0f;
+        mSecondChild.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, 0, mRestoreYValue - mSecondChildTopPosition, 0, 0, 0, 0, 0, 0, 0));
+        mRestoreYValue = 0f;
     }
 
     public void setThreshold(int threshold) {
@@ -395,6 +416,31 @@ public class PullToRefreshLayout extends RelativeLayout {
     public void setTension(int tension) {
         mTension = tension < 0 ? 0 : tension;
         calculateTotalHeight();
+    }
+
+
+    public void setMode(Mode mode) {
+        mMode = mode;
+        setupLayoutByMode(mode);
+    }
+
+    public void setupLayoutByMode(Mode mode) {
+        if (mFirstChild == null) return;
+        final LayoutParams firstChildLayoutParams = (LayoutParams) mFirstChild.getLayoutParams();
+        mFirstChildHeight = firstChildLayoutParams.height;
+        if (firstChildLayoutParams == null) return;
+        switch (mode) {
+            case OVERLAY:
+                mFirstChild.setTranslationY(0);
+                break;
+            case DRAG:
+                mFirstChild.setTranslationY(-mFirstChildHeight);
+                break;
+            case PARALLAX:
+                mFirstChild.setTranslationY(-mFirstChildHeight);
+                break;
+        }
+        mFirstChild.requestLayout();
     }
 
     private void calculateTotalHeight() {
@@ -415,10 +461,11 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void parseAttributes(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PullToRefreshLayout);
-        setFullDragDuration(a.getInteger(R.styleable.PullToRefreshLayout_fullDragDuration, 300));
-        setCancelDragDuration(a.getInteger(R.styleable.PullToRefreshLayout_cancelDragDuration, 200));
-        setThreshold(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_threshold, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_threshold)));
-        setTension(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_tension, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_tension)));
+        setFullDragDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_fullDragDuration, 300));
+        setCancelDragDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_cancelDragDuration, 200));
+        setThreshold(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_ptr_threshold, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_threshold)));
+        setTension(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_ptr_tension, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_tension)));
+        setMode(Mode.values()[a.getInt(R.styleable.PullToRefreshLayout_ptr_mode, 0)]);
         requestLayout();
         a.recycle();
     }
@@ -455,6 +502,4 @@ public class PullToRefreshLayout extends RelativeLayout {
     public void setOnNestedScrollViewScrollListener(OnNestedScrollViewScrollListener onNestedScrollViewScrollListener) {
         mOnNestedScrollViewScrollListener = onNestedScrollViewScrollListener;
     }
-
-
 }

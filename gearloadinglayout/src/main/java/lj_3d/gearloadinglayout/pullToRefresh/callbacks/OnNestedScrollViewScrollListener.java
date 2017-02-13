@@ -1,4 +1,4 @@
-package lj_3d.gearloadinglayout.pullToRefresh;
+package lj_3d.gearloadinglayout.pullToRefresh.callbacks;
 
 import android.support.v4.widget.NestedScrollView;
 

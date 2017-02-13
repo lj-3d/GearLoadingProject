@@ -38,9 +38,14 @@
     </declare-styleable>
 
     <declare-styleable name="PullToRefreshLayout">
-        <attr name="fullDragDuration" format="integer"/>
-        <attr name="cancelDragDuration" format="integer"/>
-        <attr name="threshold" format="dimension"/>
-        <attr name="tension" format="dimension"/>
+        <attr name="ptr_fullDragDuration" format="integer"/>
+        <attr name="ptr_cancelDragDuration" format="integer"/>
+        <attr name="ptr_threshold" format="dimension"/>
+        <attr name="ptr_tension" format="dimension"/>
+        <attr name="ptr_mode" format="enum">
+            <enum name="overlay" value="0"/>
+            <enum name="drag" value="1"/>
+            <enum name="parallax" value="2"/>
+        </attr>
     </declare-styleable>
 </resources>

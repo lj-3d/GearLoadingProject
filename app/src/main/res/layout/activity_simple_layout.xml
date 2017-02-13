@@ -4,9 +4,7 @@
              android:layout_height="match_parent">
 
     <lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout
-        android:id="@+id/ptr_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        style="@style/Devlight_pull_to_refresh_layout">
 
         <lj_3d.gearloadinglayout.gearViews.ThreeGearsLayout
             style="@style/Devlight_gears_layout"/>

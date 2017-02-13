@@ -5,7 +5,7 @@ import android.util.Log;
 
 import lj_3d.gearloadinglayout.gearViews.GearLoadingLayout;
 import lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout;
-import lj_3d.gearloadinglayout.pullToRefresh.RefreshCallback;
+import lj_3d.gearloadinglayout.pullToRefresh.callbacks.RefreshCallback;
 
 /**
  * Created by liubomyr on 08.02.17.

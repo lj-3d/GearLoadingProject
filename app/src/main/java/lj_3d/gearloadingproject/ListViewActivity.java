@@ -1,17 +1,11 @@
 package lj_3d.gearloadingproject;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import lj_3d.gearloadinglayout.gearViews.GearLoadingLayout;
-import lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout;
-import lj_3d.gearloadinglayout.pullToRefresh.RefreshCallback;
 
 /**
  * Created by liubomyr on 06.10.16.

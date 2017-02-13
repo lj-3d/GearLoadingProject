@@ -21,8 +21,7 @@
         </FrameLayout>
 
         <lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout
-            android:id="@+id/ptr_layout"
-            android:layout_width="match_parent"
+            style="@style/Devlight_pull_to_refresh_layout"
             android:layout_height="300dp">
 
             <lj_3d.gearloadinglayout.gearViews.ThreeGearsLayout

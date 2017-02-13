@@ -1,4 +1,4 @@
-package lj_3d.gearloadinglayout.pullToRefresh;
+package lj_3d.gearloadinglayout.pullToRefresh.callbacks;
 
 /**
  * Created by LJ on 04.02.2017.
