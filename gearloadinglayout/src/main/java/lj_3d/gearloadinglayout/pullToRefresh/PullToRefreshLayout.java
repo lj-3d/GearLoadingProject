@@ -43,13 +43,16 @@ public class PullToRefreshLayout extends RelativeLayout {
     private int mSecondChildTopPosition;
     private int mFullDragDuration;
     private int mCancelDragDuration;
-
     private float mStartYValue;
+
     private float mDeltaYValue;
     private float mMaxYValue;
+    private float mTensionYValue;
     private float mLastYValue;
     private float mRestoreYValue;
     private float mOverScrollDelta;
+    private float mDragCoefficient;
+    private float mTensionCoefficient;
 
     private View mFirstChild;
     private View mSecondChild;
@@ -116,6 +119,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                                 return false;
                             case MotionEvent.ACTION_UP:
                                 if (mStartYValue > yAxis || mInnerScrollEnabled) {
+                                    mSecondChild.setTranslationY(0f);
                                     mOverScrollDelta = 0f;
                                     mLastYValue = mSecondChild.getTranslationY();
                                     return false;
@@ -131,7 +135,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                                     if (mOverScrollDelta == 0f) { // need get overscroll offset from scrollable views
                                         mLastYValue = mSecondChild.getTranslationY();
                                         mStartYValue = mOverScrollDelta = yAxis - mLastYValue;
-                                        mMaxYValue = mStartYValue + mTotalHeight;
+                                        mMaxYValue = mStartYValue + (mThreshold * mDragCoefficient) + (mTension * mTensionCoefficient);
                                     }
                                     return onTouchEvent(event);
                                 }
@@ -270,25 +274,33 @@ public class PullToRefreshLayout extends RelativeLayout {
     }
 
     private void dragView(final float shiftOffset) {
-        mDeltaYValue = (mMaxYValue - shiftOffset);
-        final float offset = 1f - (mDeltaYValue / mTotalHeight);
-        mSecondChild.setTranslationY(mTotalHeight * offset);
+        mDeltaYValue = mMaxYValue - shiftOffset;
+        final float delta = mMaxYValue - mTensionYValue;
+        final float offset = 1f - ((delta - shiftOffset) / (mThreshold * mDragCoefficient));
+        final float dragOffset = mThreshold * offset;
+        final float dragValue = mThreshold - dragOffset;
 
-        if (mMode == Mode.DRAG) {
-            final float dragValue = (mDeltaYValue - mTension) / mThreshold;
-            if (mDeltaYValue >= mTension) {
-                mFirstChild.setTranslationY(-mFirstChildHeight * dragValue);
-            } else {
+        if (dragValue > 0f) {
+            mSecondChild.setTranslationY(dragOffset);
+
+            if (mMode == Mode.DRAG)
+                mFirstChild.setTranslationY(-dragValue);
+        } else {
+            final float tensionDelta = 1 - ((mMaxYValue - shiftOffset) / mTensionYValue);
+            mSecondChild.setTranslationY(mThreshold + (tensionDelta * mTension));
+
+            if (mMode == Mode.DRAG) {
                 if (mFirstChild.getTranslationY() != 0f)
                     mFirstChild.setTranslationY(0f);
             }
         }
 
         if (mRefreshCallback != null) {
-            mRefreshCallback.onDrag(offset);
+            final float fullDragFraction = 1 - (mSecondChild.getTranslationY() / mTotalHeight);
+            mRefreshCallback.onDrag(fullDragFraction);
             if (mTension != 0) {
-                if (mDeltaYValue <= mTension) {
-                    final float tensionFraction = 1f - (mDeltaYValue / mTension);
+                if (dragValue < 0f) {
+                    final float tensionFraction = Math.abs(dragValue) / mTension;
                     mRefreshCallback.onTension(tensionFraction);
                 } else mRefreshCallback.onTension(0f);
             }
@@ -424,6 +436,14 @@ public class PullToRefreshLayout extends RelativeLayout {
         setupLayoutByMode(mode);
     }
 
+    public void setDragCoefficient(float dragCoefficient) {
+        mDragCoefficient = dragCoefficient < 1 ? 1 : dragCoefficient;
+    }
+
+    public void setTensionCoefficient(float tensionCoefficient) {
+        mTensionCoefficient = tensionCoefficient < 1 ? 1 : tensionCoefficient;
+    }
+
     public void setupLayoutByMode(Mode mode) {
         if (mFirstChild == null) return;
         final LayoutParams firstChildLayoutParams = (LayoutParams) mFirstChild.getLayoutParams();
@@ -465,6 +485,8 @@ public class PullToRefreshLayout extends RelativeLayout {
         setCancelDragDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_cancelDragDuration, 200));
         setThreshold(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_ptr_threshold, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_threshold)));
         setTension(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_ptr_tension, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_tension)));
+        setDragCoefficient(a.getFloat(R.styleable.PullToRefreshLayout_ptr_drag_coefficient, 1.0f));
+        setTensionCoefficient(a.getFloat(R.styleable.PullToRefreshLayout_ptr_tension_coefficient, 3.0f));
         setMode(Mode.values()[a.getInt(R.styleable.PullToRefreshLayout_ptr_mode, 0)]);
         requestLayout();
         a.recycle();
@@ -472,7 +494,8 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void onActionDown(final float yAxis) {
         mStartYValue = yAxis - mLastYValue;
-        mMaxYValue = mStartYValue + mTotalHeight;
+        mTensionYValue = (mTension * mTensionCoefficient);
+        mMaxYValue = mStartYValue + (mThreshold * mDragCoefficient) + mTensionYValue;
         mOverScrollDelta = 0f;
     }
 
