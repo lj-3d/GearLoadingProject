@@ -300,7 +300,7 @@ public class PullToRefreshLayout extends RelativeLayout {
             mRefreshCallback.onDrag(fullDragFraction);
             if (mTension != 0) {
                 if (dragValue < 0f) {
-                    final float tensionFraction = Math.abs(dragValue) / mTension;
+                    final float tensionFraction = Math.abs(dragValue) / mTensionYValue;
                     mRefreshCallback.onTension(tensionFraction);
                 } else mRefreshCallback.onTension(0f);
             }
