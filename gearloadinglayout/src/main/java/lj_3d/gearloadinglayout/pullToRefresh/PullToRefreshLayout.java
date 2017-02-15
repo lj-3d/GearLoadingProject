@@ -47,17 +47,18 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private float mDeltaYValue;
     private float mMaxYValue;
-    private float mTensionYValue;
     private float mLastYValue;
     private float mRestoreYValue;
     private float mOverScrollDelta;
     private float mDragCoefficient;
     private float mTensionCoefficient;
+    private float mIncreasedTensionYValue;
+    private float mIncreasedThresholdYValue;
 
     private View mFirstChild;
     private View mSecondChild;
-    private View mViewScrollableViewToFind;
 
+    private View mViewScrollableViewToFind;
     private RefreshCallback mRefreshCallback;
     private OnChildTouchListener mOnChildTouchListener;
     private OnListViewScrollListener mOnListViewScrollListener;
@@ -135,7 +136,9 @@ public class PullToRefreshLayout extends RelativeLayout {
                                     if (mOverScrollDelta == 0f) { // need get overscroll offset from scrollable views
                                         mLastYValue = mSecondChild.getTranslationY();
                                         mStartYValue = mOverScrollDelta = yAxis - mLastYValue;
-                                        mMaxYValue = mStartYValue + (mThreshold * mDragCoefficient) + (mTension * mTensionCoefficient);
+                                        mIncreasedThresholdYValue = (mThreshold * mDragCoefficient);
+                                        mIncreasedTensionYValue = (mTension * mTensionCoefficient);
+                                        mMaxYValue = mStartYValue + mIncreasedThresholdYValue + mIncreasedTensionYValue;
                                     }
                                     return onTouchEvent(event);
                                 }
@@ -254,7 +257,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                         dragWithTension();
                     }
                 } else if (mStartYValue < yAxis) {
-                    dragUpView(mTotalHeight - mDeltaYValue);
+                    dragUpView((mIncreasedThresholdYValue + mIncreasedTensionYValue) - mDeltaYValue);
                 } else if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0f);
                     mOverScrollDelta = 0f;
@@ -275,7 +278,7 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void dragView(final float shiftOffset) {
         mDeltaYValue = mMaxYValue - shiftOffset;
-        final float delta = mMaxYValue - mTensionYValue;
+        final float delta = mMaxYValue - mIncreasedTensionYValue;
         final float offset = 1f - ((delta - shiftOffset) / (mThreshold * mDragCoefficient));
         final float dragOffset = mThreshold * offset;
         final float dragValue = mThreshold - dragOffset;
@@ -286,7 +289,7 @@ public class PullToRefreshLayout extends RelativeLayout {
             if (mMode == Mode.DRAG)
                 mFirstChild.setTranslationY(-dragValue);
         } else {
-            final float tensionDelta = 1 - ((mMaxYValue - shiftOffset) / mTensionYValue);
+            final float tensionDelta = 1 - ((mMaxYValue - shiftOffset) / mIncreasedTensionYValue);
             mSecondChild.setTranslationY(mThreshold + (tensionDelta * mTension));
 
             if (mMode == Mode.DRAG) {
@@ -300,7 +303,7 @@ public class PullToRefreshLayout extends RelativeLayout {
             mRefreshCallback.onDrag(fullDragFraction);
             if (mTension != 0) {
                 if (dragValue < 0f) {
-                    final float tensionFraction = Math.abs(dragValue) / mTensionYValue;
+                    final float tensionFraction = Math.abs(dragValue) / mIncreasedTensionYValue;
                     mRefreshCallback.onTension(tensionFraction);
                 } else mRefreshCallback.onTension(0f);
             }
@@ -383,6 +386,7 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void onBackDrag(final ValueAnimator valueAnimator) {
         final float delta = (float) valueAnimator.getAnimatedValue();
+        Log.d("onBackDrag ", " " + delta);
         mSecondChild.setTranslationY(delta);
         if (mMode == Mode.DRAG) {
             mFirstChild.setTranslationY(delta - mFirstChildHeight);
@@ -494,8 +498,9 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void onActionDown(final float yAxis) {
         mStartYValue = yAxis - mLastYValue;
-        mTensionYValue = (mTension * mTensionCoefficient);
-        mMaxYValue = mStartYValue + (mThreshold * mDragCoefficient) + mTensionYValue;
+        mIncreasedThresholdYValue = (mThreshold * mDragCoefficient);
+        mIncreasedTensionYValue = (mTension * mTensionCoefficient);
+        mMaxYValue = mStartYValue + mIncreasedThresholdYValue + mIncreasedTensionYValue;
         mOverScrollDelta = 0f;
     }
 
