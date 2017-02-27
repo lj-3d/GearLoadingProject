@@ -34,7 +34,7 @@ public class PullToRefreshConfigurator {
 
             @Override
             public void onTension(float offset) {
-                Log.d("onTension ", "offset " + offset);
+//                Log.d("onTension ", "offset " + offset);
                 final float scaleValue = 0.1f * offset;
                 gearLoadingLayout.setScaleX(1 + scaleValue);
                 gearLoadingLayout.setScaleY(1 + scaleValue);
@@ -42,7 +42,7 @@ public class PullToRefreshConfigurator {
 
             @Override
             public void onTensionUp(float offset) {
-                Log.d("onTensionUp ", "offset " + offset);
+//                Log.d("onTensionUp ", "offset " + offset);
                 final float scaleValue = 0.1f * offset;
                 gearLoadingLayout.setScaleX(1.1f - scaleValue);
                 gearLoadingLayout.setScaleY(1.1f - scaleValue);

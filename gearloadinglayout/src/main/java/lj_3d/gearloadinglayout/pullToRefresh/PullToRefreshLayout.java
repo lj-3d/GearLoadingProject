@@ -65,6 +65,11 @@ public class PullToRefreshLayout extends RelativeLayout {
     private OnPullToRefreshTouchEvent mOnPullToRefreshTouchEvent;
     private OnNestedScrollViewScrollListener mOnNestedScrollViewScrollListener;
 
+    private ValueAnimator mDragUpAnimator;
+    private ValueAnimator mDragTensionUpAnimator;
+
+    private boolean mAmationCenceled;
+
     public PullToRefreshLayout(Context context) {
         this(context, null);
     }
@@ -254,10 +259,13 @@ public class PullToRefreshLayout extends RelativeLayout {
                     if (mTension == 0)
                         onRefresh();
                     else {
-                        dragWithTension();
+                        dragUpWithTension(mSecondChild.getTranslationY());
                     }
                 } else if (mStartYValue < yAxis) {
-                    dragUpView((mIncreasedThresholdYValue + mIncreasedTensionYValue) - mDeltaYValue);
+                    if (mSecondChild.getTranslationY() <= mThreshold)
+                        dragUpView(mSecondChild.getTranslationY());
+                    else
+                        dragUpWithTension(mSecondChild.getTranslationY());
                 } else if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0f);
                     mOverScrollDelta = 0f;
@@ -311,10 +319,15 @@ public class PullToRefreshLayout extends RelativeLayout {
     }
 
     private void dragUpView(final float from) {
-        final ValueAnimator backDragAnimator = new ValueAnimator();
-        backDragAnimator.setFloatValues(from, 0f);
-        backDragAnimator.setDuration(mIsRefreshing ? mFullDragDuration : mCancelDragDuration);
-        backDragAnimator.addListener(new Animator.AnimatorListener() {
+        if (mDragUpAnimator != null) {
+            mDragUpAnimator.cancel();
+            Log.d("onAnimationCancel", mDragUpAnimator.toString());
+        }
+
+        mDragUpAnimator = new ValueAnimator();
+        mDragUpAnimator.setFloatValues(from, 0f);
+        mDragUpAnimator.setDuration(mIsRefreshing ? mFullDragDuration : mCancelDragDuration);
+        mDragUpAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
                 if (mRefreshCallback != null)
@@ -339,20 +352,22 @@ public class PullToRefreshLayout extends RelativeLayout {
             }
         });
 
-        backDragAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        mDragUpAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                Log.d("onAnimationUpdate", valueAnimator.isRunning() + " " + valueAnimator.toString());
                 onBackDrag(valueAnimator);
             }
         });
-        backDragAnimator.start();
+        mDragUpAnimator.start();
     }
 
-    private void dragWithTension() {
-        final ValueAnimator tensionAnimator = new ValueAnimator();
-        tensionAnimator.setDuration(200);
-        tensionAnimator.setFloatValues(mTotalHeight, mThreshold);
-        tensionAnimator.addListener(new Animator.AnimatorListener() {
+    private void dragUpWithTension(final float from) {
+
+        mDragTensionUpAnimator = new ValueAnimator();
+        mDragTensionUpAnimator.setDuration(200);
+        mDragTensionUpAnimator.setFloatValues(from, mThreshold);
+        mDragTensionUpAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
 
@@ -375,31 +390,30 @@ public class PullToRefreshLayout extends RelativeLayout {
 
             }
         });
-        tensionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        mDragTensionUpAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 onBackTension(valueAnimator);
             }
         });
-        tensionAnimator.start();
+        mDragTensionUpAnimator.start();
     }
 
     private void onBackDrag(final ValueAnimator valueAnimator) {
         final float delta = (float) valueAnimator.getAnimatedValue();
-        Log.d("onBackDrag ", " " + delta);
         mSecondChild.setTranslationY(delta);
         if (mMode == Mode.DRAG) {
             mFirstChild.setTranslationY(delta - mFirstChildHeight);
         }
         if (mRefreshCallback != null)
-            mRefreshCallback.onBackDrag(valueAnimator.getAnimatedFraction());
+            mRefreshCallback.onBackDrag(delta);
     }
 
     private void onBackTension(final ValueAnimator valueAnimator) {
         final float delta = (float) valueAnimator.getAnimatedValue();
         mSecondChild.setTranslationY(delta);
         if (mRefreshCallback != null)
-            mRefreshCallback.onTensionUp(valueAnimator.getAnimatedFraction());
+            mRefreshCallback.onTensionUp(1 - ((delta - mTension) / mTension));
     }
 
     private void onRefresh() {
@@ -530,4 +544,5 @@ public class PullToRefreshLayout extends RelativeLayout {
     public void setOnNestedScrollViewScrollListener(OnNestedScrollViewScrollListener onNestedScrollViewScrollListener) {
         mOnNestedScrollViewScrollListener = onNestedScrollViewScrollListener;
     }
+
 }
