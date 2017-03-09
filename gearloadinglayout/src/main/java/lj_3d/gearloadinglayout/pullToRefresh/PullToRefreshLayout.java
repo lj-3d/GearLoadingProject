@@ -41,8 +41,9 @@ public class PullToRefreshLayout extends RelativeLayout {
     private int mTotalHeight;
     private int mFirstChildHeight;
     private int mSecondChildTopPosition;
-    private int mFullDragDuration;
-    private int mCancelDragDuration;
+    private int mFullBackDuration;
+    private int mCancelBackDuration;
+    private int mTensionBackDuration;
     private float mStartYValue;
 
     private float mDeltaYValue;
@@ -64,11 +65,6 @@ public class PullToRefreshLayout extends RelativeLayout {
     private OnListViewScrollListener mOnListViewScrollListener;
     private OnPullToRefreshTouchEvent mOnPullToRefreshTouchEvent;
     private OnNestedScrollViewScrollListener mOnNestedScrollViewScrollListener;
-
-    private ValueAnimator mDragUpAnimator;
-    private ValueAnimator mDragTensionUpAnimator;
-
-    private boolean mAmationCenceled;
 
     public PullToRefreshLayout(Context context) {
         this(context, null);
@@ -114,15 +110,33 @@ public class PullToRefreshLayout extends RelativeLayout {
 
                         final float yAxis = event.getRawY();
 
-                        if (mIsRefreshing) {
-                            if (event.getAction() == MotionEvent.ACTION_DOWN)
+                        int eventAction = event.getAction();
+
+                        if (eventAction == MotionEvent.ACTION_POINTER_DOWN ||
+                                eventAction == MotionEvent.ACTION_POINTER_2_DOWN ||
+                                eventAction == MotionEvent.ACTION_POINTER_UP ||
+                                eventAction == MotionEvent.ACTION_POINTER_2_UP) {
+                            Log.d("motion_event_", " " + eventAction + " yAxis " + yAxis);
+                        }
+
+                        if (mIsRefreshing || getTag() != null) {
+                            if (eventAction == MotionEvent.ACTION_DOWN)
                                 mRestoreYValue = yAxis;
                             return true; // control for blocking content
                         }
-                        switch (event.getAction()) {
+                        switch (eventAction) {
                             case MotionEvent.ACTION_DOWN:
+                                if (mSecondChildTopPosition > 0) {
+                                    if (dragUpAnimator != null && dragUpAnimator.isRunning())
+                                        dragUpAnimator.cancel();
+                                    if (dragTensionUpAnimator != null && dragTensionUpAnimator.isRunning())
+                                        dragTensionUpAnimator.cancel();
+                                }
                                 onActionDown(yAxis);
+                                Log.d("onActionDown", "triggered");
                                 return false;
+                            case MotionEvent.ACTION_POINTER_2_DOWN:
+                                break;
                             case MotionEvent.ACTION_UP:
                                 if (mStartYValue > yAxis || mInnerScrollEnabled) {
                                     mSecondChild.setTranslationY(0f);
@@ -132,7 +146,28 @@ public class PullToRefreshLayout extends RelativeLayout {
                                 } else {
                                     return onTouchEvent(event);
                                 }
+                            case MotionEvent.ACTION_POINTER_UP:
+                                onActionDown(mStartYValue + mLastYValue);
+                                if (mStartYValue > yAxis || mInnerScrollEnabled) {
+                                    mSecondChild.setTranslationY(0f);
+                                    mOverScrollDelta = 0f;
+                                    mLastYValue = mSecondChild.getTranslationY();
+                                    return false;
+                                } else {
+                                    return onTouchEvent(event);
+                                }
+                            case MotionEvent.ACTION_POINTER_2_UP:
+                                return false;
+                            case MotionEvent.ACTION_CANCEL:
+                                Log.d("onActionDown_cancel", "triggered");
+                                break;
                             case MotionEvent.ACTION_MOVE:
+                                if (mSecondChildTopPosition > 0) {
+                                    if (dragUpAnimator != null && dragUpAnimator.isRunning())
+                                        dragUpAnimator.cancel();
+                                    if (dragTensionUpAnimator != null && dragTensionUpAnimator.isRunning())
+                                        dragTensionUpAnimator.cancel();
+                                }
                                 if (mStartYValue > yAxis || mInnerScrollEnabled) {
                                     mSecondChild.setTranslationY(0f);
                                     mOverScrollDelta = 0f;
@@ -242,6 +277,15 @@ public class PullToRefreshLayout extends RelativeLayout {
         if (mOnPullToRefreshTouchEvent != null)
             mOnPullToRefreshTouchEvent.onTouchEvent(event);
 
+        final int eventAction = event.getAction();
+        if (eventAction == MotionEvent.ACTION_POINTER_DOWN ||
+                eventAction == MotionEvent.ACTION_POINTER_2_DOWN ||
+                eventAction == MotionEvent.ACTION_POINTER_UP ||
+                eventAction == MotionEvent.ACTION_POINTER_2_UP) {
+            Log.d("motion_event_reset", " " + event.getAction());
+            return false;
+        }
+
         if (mFirstChild == null || mSecondChild == null || mIsRefreshing) {
             return super.onTouchEvent(event);
         }
@@ -249,9 +293,15 @@ public class PullToRefreshLayout extends RelativeLayout {
         final float yAxis = event.getRawY() < mOverScrollDelta ? event.getRawY() + mOverScrollDelta : event.getRawY();
         final float minValue = Math.min(yAxis, Math.min(yAxis, mMaxYValue));
 
-        switch (event.getAction()) {
+        switch (eventAction) {
             case MotionEvent.ACTION_DOWN:
-                onActionDown(yAxis);
+                if (mSecondChildTopPosition > 0) {
+                    if (dragUpAnimator != null && dragUpAnimator.isRunning())
+                        dragUpAnimator.cancel();
+                    if (dragTensionUpAnimator != null && dragTensionUpAnimator.isRunning())
+                        dragTensionUpAnimator.cancel();
+                } else
+                    onActionDown(yAxis);
                 break;
             case MotionEvent.ACTION_UP:
                 if (minValue >= mMaxYValue) {
@@ -262,9 +312,9 @@ public class PullToRefreshLayout extends RelativeLayout {
                         dragUpWithTension(mSecondChild.getTranslationY());
                     }
                 } else if (mStartYValue < yAxis) {
-                    if (mSecondChild.getTranslationY() <= mThreshold)
+                    if (mSecondChild.getTranslationY() <= mThreshold) {
                         dragUpView(mSecondChild.getTranslationY());
-                    else
+                    } else
                         dragUpWithTension(mSecondChild.getTranslationY());
                 } else if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0f);
@@ -274,6 +324,12 @@ public class PullToRefreshLayout extends RelativeLayout {
                 mOverScrollDelta = 0f;
                 break;
             case MotionEvent.ACTION_MOVE:
+                if (mSecondChildTopPosition > 0) {
+                    if (dragUpAnimator != null && dragUpAnimator.isRunning())
+                        dragUpAnimator.cancel();
+                    if (dragTensionUpAnimator != null && dragTensionUpAnimator.isRunning())
+                        dragTensionUpAnimator.cancel();
+                }
                 if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0);
                 } else {
@@ -318,16 +374,13 @@ public class PullToRefreshLayout extends RelativeLayout {
         }
     }
 
-    private void dragUpView(final float from) {
-        if (mDragUpAnimator != null) {
-            mDragUpAnimator.cancel();
-            Log.d("onAnimationCancel", mDragUpAnimator.toString());
-        }
+    ValueAnimator dragUpAnimator;
 
-        mDragUpAnimator = new ValueAnimator();
-        mDragUpAnimator.setFloatValues(from, 0f);
-        mDragUpAnimator.setDuration(mIsRefreshing ? mFullDragDuration : mCancelDragDuration);
-        mDragUpAnimator.addListener(new Animator.AnimatorListener() {
+    private void dragUpView(final float from) {
+        dragUpAnimator = new ValueAnimator();
+        dragUpAnimator.setFloatValues(from, 0f);
+        dragUpAnimator.setDuration(getTag() != null ? mFullBackDuration : mCancelBackDuration);
+        dragUpAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
                 if (mRefreshCallback != null)
@@ -352,25 +405,26 @@ public class PullToRefreshLayout extends RelativeLayout {
             }
         });
 
-        mDragUpAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        dragUpAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                Log.d("onAnimationUpdate", valueAnimator.isRunning() + " " + valueAnimator.toString());
                 onBackDrag(valueAnimator);
             }
         });
-        mDragUpAnimator.start();
+        dragUpAnimator.start();
     }
 
-    private void dragUpWithTension(final float from) {
+    ValueAnimator dragTensionUpAnimator;
 
-        mDragTensionUpAnimator = new ValueAnimator();
-        mDragTensionUpAnimator.setDuration(200);
-        mDragTensionUpAnimator.setFloatValues(from, mThreshold);
-        mDragTensionUpAnimator.addListener(new Animator.AnimatorListener() {
+    private void dragUpWithTension(final float from) {
+        dragTensionUpAnimator = new ValueAnimator();
+        dragTensionUpAnimator.setDuration(mTensionBackDuration);
+        dragTensionUpAnimator.setFloatValues(from, mThreshold);
+
+        setTag(dragTensionUpAnimator);
+        dragTensionUpAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-
             }
 
             @Override
@@ -382,31 +436,31 @@ public class PullToRefreshLayout extends RelativeLayout {
 
             @Override
             public void onAnimationCancel(Animator animation) {
-
             }
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-
             }
         });
-        mDragTensionUpAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+        dragTensionUpAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 onBackTension(valueAnimator);
             }
         });
-        mDragTensionUpAnimator.start();
+        dragTensionUpAnimator.start();
     }
 
     private void onBackDrag(final ValueAnimator valueAnimator) {
         final float delta = (float) valueAnimator.getAnimatedValue();
+        final float fraction = valueAnimator.getAnimatedFraction();
         mSecondChild.setTranslationY(delta);
         if (mMode == Mode.DRAG) {
             mFirstChild.setTranslationY(delta - mFirstChildHeight);
         }
         if (mRefreshCallback != null)
-            mRefreshCallback.onBackDrag(delta);
+            mRefreshCallback.onBackDrag(fraction);
     }
 
     private void onBackTension(final ValueAnimator valueAnimator) {
@@ -436,6 +490,8 @@ public class PullToRefreshLayout extends RelativeLayout {
         mLastYValue = 0f;
         mSecondChild.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, 0, mRestoreYValue - mSecondChildTopPosition, 0, 0, 0, 0, 0, 0, 0));
         mRestoreYValue = 0f;
+        setTag(null);
+        Log.d("onActionDown_reset", "triggered");
     }
 
     public void setThreshold(int threshold) {
@@ -485,12 +541,16 @@ public class PullToRefreshLayout extends RelativeLayout {
         mTotalHeight = mThreshold + mTension;
     }
 
-    public void setFullDragDuration(int fullDragDuration) {
-        this.mFullDragDuration = fullDragDuration;
+    public void setFullBackDuration(int fullBackDuration) {
+        this.mFullBackDuration = fullBackDuration;
     }
 
-    public void setCancelDragDuration(int cancelDragDuration) {
-        this.mCancelDragDuration = cancelDragDuration;
+    public void setCancelBackDuration(int cancelBackDuration) {
+        this.mCancelBackDuration = cancelBackDuration;
+    }
+
+    public void setTensionBackDuration(int tensionBackDuration) {
+        this.mTensionBackDuration = tensionBackDuration;
     }
 
     public boolean isRefreshing() {
@@ -499,8 +559,9 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void parseAttributes(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PullToRefreshLayout);
-        setFullDragDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_fullDragDuration, 300));
-        setCancelDragDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_cancelDragDuration, 200));
+        setFullBackDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_fullBackDuration, 300));
+        setCancelBackDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_cancelBackDuration, 200));
+        setTensionBackDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_cancelBackDuration, 200));
         setThreshold(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_ptr_threshold, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_threshold)));
         setTension(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_ptr_tension, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_tension)));
         setDragCoefficient(a.getFloat(R.styleable.PullToRefreshLayout_ptr_drag_coefficient, 1.0f));

@@ -1,7 +1,6 @@
 package lj_3d.gearloadingproject;
 
 import android.os.Handler;
-import android.util.Log;
 
 import lj_3d.gearloadinglayout.gearViews.GearLoadingLayout;
 import lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout;
@@ -14,7 +13,8 @@ import lj_3d.gearloadinglayout.pullToRefresh.callbacks.RefreshCallback;
 public class PullToRefreshConfigurator {
 
     public static void setupPullToRefresh(final PullToRefreshLayout pullToRefreshLayout, final GearLoadingLayout gearLoadingLayout) {
-        pullToRefreshLayout.setFullDragDuration(1000);
+        pullToRefreshLayout.setFullBackDuration(1000);
+        pullToRefreshLayout.setCancelBackDuration(1000);
         pullToRefreshLayout.setRefreshCallback(new RefreshCallback() {
             @Override
             public void onRefresh() {

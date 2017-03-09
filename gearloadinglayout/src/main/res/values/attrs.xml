@@ -38,8 +38,9 @@
     </declare-styleable>
 
     <declare-styleable name="PullToRefreshLayout">
-        <attr name="ptr_fullDragDuration" format="integer"/>
-        <attr name="ptr_cancelDragDuration" format="integer"/>
+        <attr name="ptr_fullBackDuration" format="integer"/>
+        <attr name="ptr_cancelBackDuration" format="integer"/>
+        <attr name="ptr_tensionBackDuration" format="integer"/>
         <attr name="ptr_threshold" format="dimension"/>
         <attr name="ptr_tension" format="dimension"/>
         <attr name="ptr_drag_coefficient" format="float"/>
