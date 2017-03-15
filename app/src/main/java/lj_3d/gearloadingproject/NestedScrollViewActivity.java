@@ -11,7 +11,7 @@ import lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout;
  * Created by liubomyr on 06.10.16.
  */
 
-public class NestedScrollViewActivity extends ScrollViewActivity {
+public class NestedScrollViewActivity extends PullToRefreshHeaderActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
