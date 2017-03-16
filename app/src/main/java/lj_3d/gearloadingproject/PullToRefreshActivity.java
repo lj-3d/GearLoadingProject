@@ -56,7 +56,7 @@ public class PullToRefreshActivity extends AppCompatActivity implements View.OnC
                 clazz = WebViewActivity.class;
                 break;
             default:
-                clazz = MainActivity.class;
+                clazz = SimpleActivity.class;
                 break;
         }
         startActivity(clazz);

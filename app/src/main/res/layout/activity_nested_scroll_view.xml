@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -27,13 +27,13 @@
             <lj_3d.gearloadinglayout.gearViews.ThreeGearsLayout
                 style="@style/Devlight_gears_layout"/>
 
-            <android.support.v4.widget.NestedScrollView
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <include layout="@layout/scroll_view_container"/>
 
-            </android.support.v4.widget.NestedScrollView>
+            </ScrollView>
         </lj_3d.gearloadinglayout.pullToRefresh.PullToRefreshLayout>
 
 
@@ -61,4 +61,4 @@
 
     </LinearLayout>
 
-</ScrollView>
+</android.support.v4.widget.NestedScrollView>

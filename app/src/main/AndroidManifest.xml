@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="lj_3d.gearloadingproject">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
 
     <application
@@ -20,6 +20,9 @@
         </activity>
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".SimpleActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".ListViewActivity"
