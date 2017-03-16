@@ -220,14 +220,6 @@ public class PullToRefreshLayout extends FrameLayout {
                 }
             });
         } else if (scrollableView instanceof NestedScrollView) {
-            final NestedScrollView nestedScrollView = (NestedScrollView) scrollableView;
-//            requestDisallowInterceptTouchEvent(true);
-//            nestedScrollView.setNestedScrollingEnabled(true);
-//            nestedScrollView.setFillViewport(true);
-//            nestedScrollView.setSmoothScrollingEnabled(true);
-//            nestedScrollView.setHasTransientState(true);
-//            nestedScrollView.setFocusableInTouchMode(true);
-            Log.d("hasNestedScrollingParent", nestedScrollView.hasNestedScrollingParent() + " " + nestedScrollView.isNestedScrollingEnabled()+ " " + nestedScrollView.isSmoothScrollingEnabled());
             ((NestedScrollView) scrollableView).setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
                 @Override
                 public void onScrollChange(NestedScrollView nestedScrollView, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
@@ -260,7 +252,7 @@ public class PullToRefreshLayout extends FrameLayout {
         if (eventAction == MotionEvent.ACTION_POINTER_2_DOWN || eventAction == MotionEvent.ACTION_POINTER_INDEX_MASK)
             mSecondChild.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP, 0, event.getRawY(), 0, 0, 0, 0, 0, 0, 0));
 
-        if (mFirstChild == null || mSecondChild == null || mIsRefreshing) {
+        if (mFirstChild == null || mSecondChild == null || mIsRefreshing || getTag() != null) {
             return super.onTouchEvent(event);
         }
 
