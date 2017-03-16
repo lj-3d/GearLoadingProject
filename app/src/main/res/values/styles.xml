@@ -39,7 +39,7 @@
 
     <style name="Devlight_pull_to_refresh_layout">
         <item name="android:id">@id/ptr_layout</item>
-        <item name="ptr_mode">drag</item>
+        <item name="ptr_drag_mode">drag</item>
         <item name="ptr_tension">100dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>

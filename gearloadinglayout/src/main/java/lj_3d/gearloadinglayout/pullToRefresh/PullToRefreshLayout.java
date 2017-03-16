@@ -5,7 +5,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -17,7 +16,6 @@ import android.view.ViewTreeObserver;
 import android.webkit.WebView;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
 import lj_3d.gearloadinglayout.R;
@@ -33,7 +31,8 @@ import lj_3d.gearloadinglayout.pullToRefresh.callbacks.RefreshCallback;
 
 public class PullToRefreshLayout extends FrameLayout {
 
-    private Mode mMode;
+    private DragMode mDragMode;
+    private TensionMode mTensionMode;
 
     private boolean mIsRefreshing;
     private boolean mInnerScrollEnabled;
@@ -103,7 +102,7 @@ public class PullToRefreshLayout extends FrameLayout {
                 mFirstChild.setEnabled(false);
                 mFirstChild.setFocusable(false);
                 mFirstChild.setFocusableInTouchMode(false);
-                setupLayoutByMode(mMode);
+                setupLayoutByMode(mDragMode);
 
                 // set touch listener to child to obtain y coordinates and motion events
                 mViewScrollableViewToFind.setOnTouchListener(new OnTouchListener() {
@@ -187,13 +186,13 @@ public class PullToRefreshLayout extends FrameLayout {
         if (scrollableView instanceof AbsListView) {
             ((AbsListView) scrollableView).setOnScrollListener(new AbsListView.OnScrollListener() {
                 @Override
-                public void onScrollStateChanged(AbsListView listView, int scrollState) {
+                public void onScrollStateChanged(final AbsListView listView, final int scrollState) {
                     if (mOnListViewScrollListener != null)
                         mOnListViewScrollListener.onScrollStateChanged(listView, scrollState);
                 }
 
                 @Override
-                public void onScroll(AbsListView listView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                public void onScroll(final AbsListView listView, final int firstVisibleItem, final int visibleItemCount, final int totalItemCount) {
                     if (mOnListViewScrollListener != null)
                         mOnListViewScrollListener.onScroll(listView, firstVisibleItem, visibleItemCount, totalItemCount);
 
@@ -206,12 +205,12 @@ public class PullToRefreshLayout extends FrameLayout {
         } else if (scrollableView instanceof RecyclerView) {
             ((RecyclerView) scrollableView).addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                public void onScrollStateChanged(final RecyclerView recyclerView, final int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
                 }
 
                 @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                public void onScrolled(final RecyclerView recyclerView, final int dx, final int dy) {
                     super.onScrolled(recyclerView, dx, dy);
                     if (recyclerView != null && recyclerView.getChildAt(0) != null) {
                         final int topPosition = recyclerView.getChildAt(0).getTop();
@@ -222,7 +221,7 @@ public class PullToRefreshLayout extends FrameLayout {
         } else if (scrollableView instanceof NestedScrollView) {
             ((NestedScrollView) scrollableView).setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
                 @Override
-                public void onScrollChange(NestedScrollView nestedScrollView, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                public void onScrollChange(final NestedScrollView nestedScrollView, final int scrollX, final int scrollY, final int oldScrollX, final int oldScrollY) {
                     if (mOnNestedScrollViewScrollListener != null)
                         mOnNestedScrollViewScrollListener.onScrollChange(nestedScrollView, scrollX, scrollY, oldScrollX, oldScrollY);
                     mInnerScrollEnabled = scrollY != 0f;
@@ -230,7 +229,6 @@ public class PullToRefreshLayout extends FrameLayout {
                 }
             });
         } else {
-            ViewCompat.setNestedScrollingEnabled(scrollableView, true);
             scrollableView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
                 @Override
                 public void onScrollChanged() {
@@ -243,7 +241,7 @@ public class PullToRefreshLayout extends FrameLayout {
 
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(final MotionEvent event) {
         if (mOnPullToRefreshTouchEvent != null)
             mOnPullToRefreshTouchEvent.onTouchEvent(event);
 
@@ -315,15 +313,20 @@ public class PullToRefreshLayout extends FrameLayout {
         if (dragValue > 0f) {
             mSecondChild.setTranslationY(dragOffset);
 
-            if (mMode == Mode.DRAG)
+            if (mDragMode == DragMode.DRAG)
                 mFirstChild.setTranslationY(-dragValue);
         } else {
             final float tensionDelta = 1 - ((mMaxYValue - shiftOffset) / mIncreasedTensionYValue);
-            mSecondChild.setTranslationY(mThreshold + (tensionDelta * mTension));
+            final float tensionOffset = tensionDelta * mTension;
+            mSecondChild.setTranslationY(mThreshold + tensionOffset);
 
-            if (mMode == Mode.DRAG) {
-                if (mFirstChild.getTranslationY() != 0f)
-                    mFirstChild.setTranslationY(0f);
+            if (mDragMode == DragMode.DRAG) {
+                if (mTensionMode == TensionMode.BOTTOM) {
+                    if (mFirstChild.getTranslationY() != 0f)
+                        mFirstChild.setTranslationY(0f);
+                } else if (mTensionMode == TensionMode.TOP) {
+                    mFirstChild.setTranslationY(tensionOffset);
+                }
             }
         }
 
@@ -417,7 +420,7 @@ public class PullToRefreshLayout extends FrameLayout {
         final float delta = (float) valueAnimator.getAnimatedValue();
         final float fraction = valueAnimator.getAnimatedFraction();
         mSecondChild.setTranslationY(delta);
-        if (mMode == Mode.DRAG) {
+        if (mDragMode == DragMode.DRAG) {
             mFirstChild.setTranslationY(delta - mFirstChildHeight);
         }
         if (mRefreshCallback != null)
@@ -427,8 +430,12 @@ public class PullToRefreshLayout extends FrameLayout {
     private void onBackTension(final ValueAnimator valueAnimator) {
         final float delta = (float) valueAnimator.getAnimatedValue();
         mSecondChild.setTranslationY(delta);
-        if (mRefreshCallback != null)
+        if (mDragMode == DragMode.DRAG && mTensionMode == TensionMode.TOP && mTension > 0) {
+            mFirstChild.setTranslationY(delta - mThreshold);
+        }
+        if (mRefreshCallback != null) {
             mRefreshCallback.onTensionUp(1 - ((delta - mTension) / mTension));
+        }
     }
 
     private void onRefresh() {
@@ -453,36 +460,40 @@ public class PullToRefreshLayout extends FrameLayout {
         setTag(null);
     }
 
-    public void setThreshold(int threshold) {
+    public void setThreshold(final int threshold) {
         mThreshold = threshold;
         calculateTotalHeight();
     }
 
-    public void setTension(int tension) {
+    public void setTension(final int tension) {
         mTension = tension < 0 ? 0 : tension;
         calculateTotalHeight();
     }
 
 
-    public void setMode(Mode mode) {
-        mMode = mode;
-        setupLayoutByMode(mode);
+    public void setDragMode(final DragMode dragMode) {
+        mDragMode = dragMode;
+        setupLayoutByMode(dragMode);
     }
 
-    public void setDragCoefficient(float dragCoefficient) {
+    public void setTensionMode(final TensionMode tensionMode) {
+        mTensionMode = tensionMode;
+    }
+
+    public void setDragCoefficient(final float dragCoefficient) {
         mDragCoefficient = dragCoefficient < 1 ? 1 : dragCoefficient;
     }
 
-    public void setTensionCoefficient(float tensionCoefficient) {
+    public void setTensionCoefficient(final float tensionCoefficient) {
         mTensionCoefficient = tensionCoefficient < 1 ? 1 : tensionCoefficient;
     }
 
-    public void setupLayoutByMode(Mode mode) {
+    public void setupLayoutByMode(final DragMode dragMode) {
         if (mFirstChild == null) return;
         final LayoutParams firstChildLayoutParams = (LayoutParams) mFirstChild.getLayoutParams();
         mFirstChildHeight = firstChildLayoutParams.height;
         if (firstChildLayoutParams == null) return;
-        switch (mode) {
+        switch (dragMode) {
             case OVERLAY:
                 mFirstChild.setTranslationY(0);
                 break;
@@ -525,7 +536,8 @@ public class PullToRefreshLayout extends FrameLayout {
         setTension(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_ptr_tension, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_tension)));
         setDragCoefficient(a.getFloat(R.styleable.PullToRefreshLayout_ptr_drag_coefficient, 1.0f));
         setTensionCoefficient(a.getFloat(R.styleable.PullToRefreshLayout_ptr_tension_coefficient, 3.0f));
-        setMode(Mode.values()[a.getInt(R.styleable.PullToRefreshLayout_ptr_mode, 0)]);
+        setDragMode(DragMode.values()[a.getInt(R.styleable.PullToRefreshLayout_ptr_drag_mode, 0)]);
+        setTensionMode(TensionMode.values()[a.getInt(R.styleable.PullToRefreshLayout_ptr_tension_mode, 0)]);
         requestLayout();
         a.recycle();
     }

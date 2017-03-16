@@ -45,10 +45,14 @@
         <attr name="ptr_tension" format="dimension"/>
         <attr name="ptr_drag_coefficient" format="float"/>
         <attr name="ptr_tension_coefficient" format="float"/>
-        <attr name="ptr_mode" format="enum">
+        <attr name="ptr_drag_mode" format="enum">
             <enum name="overlay" value="0"/>
             <enum name="drag" value="1"/>
             <enum name="parallax" value="2"/>
+        </attr>
+        <attr name="ptr_tension_mode" format="enum">
+            <enum name="top" value="0"/>
+            <enum name="bottom" value="1"/>
         </attr>
     </declare-styleable>
 </resources>
