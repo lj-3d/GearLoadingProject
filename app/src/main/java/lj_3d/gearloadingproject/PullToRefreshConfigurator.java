@@ -13,8 +13,8 @@ import lj_3d.gearloadinglayout.pullToRefresh.callbacks.RefreshCallback;
 public class PullToRefreshConfigurator {
 
     public static void setupPullToRefresh(final PullToRefreshLayout pullToRefreshLayout, final GearLoadingLayout gearLoadingLayout) {
-        pullToRefreshLayout.setFullBackDuration(1000);
-        pullToRefreshLayout.setCancelBackDuration(1000);
+        pullToRefreshLayout.setFullBackDuration(500);
+//        pullToRefreshLayout.setCancelBackDuration(1000);
         pullToRefreshLayout.setRefreshCallback(new RefreshCallback() {
             @Override
             public void onRefresh() {
@@ -34,7 +34,6 @@ public class PullToRefreshConfigurator {
 
             @Override
             public void onTension(float offset) {
-//                Log.d("onTension ", "offset " + offset);
                 final float scaleValue = 0.1f * offset;
                 gearLoadingLayout.setScaleX(1 + scaleValue);
                 gearLoadingLayout.setScaleY(1 + scaleValue);
@@ -42,7 +41,6 @@ public class PullToRefreshConfigurator {
 
             @Override
             public void onTensionUp(float offset) {
-//                Log.d("onTensionUp ", "offset " + offset);
                 final float scaleValue = 0.1f * offset;
                 gearLoadingLayout.setScaleX(1.1f - scaleValue);
                 gearLoadingLayout.setScaleY(1.1f - scaleValue);
@@ -68,6 +66,13 @@ public class PullToRefreshConfigurator {
             public void onTensionComplete() {
             }
         });
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                pullToRefreshLayout.callAutoRefresh();
+            }
+        }, 1000);
     }
 
 

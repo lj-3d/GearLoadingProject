@@ -36,6 +36,7 @@ public class PullToRefreshLayout extends FrameLayout {
 
     private boolean mIsRefreshing;
     private boolean mInnerScrollEnabled;
+    private boolean mIsChildTouched;
 
     private int mThreshold;
     private int mTension;
@@ -45,6 +46,7 @@ public class PullToRefreshLayout extends FrameLayout {
     private int mFullBackDuration;
     private int mCancelBackDuration;
     private int mTensionBackDuration;
+    private int mAutoRefreshDuration;
 
     private float mMaxYValue;
     private float mLastYValue;
@@ -61,8 +63,9 @@ public class PullToRefreshLayout extends FrameLayout {
     private View mSecondChild;
     private View mViewScrollableViewToFind;
 
-    private ValueAnimator dragUpAnimator;
-    private ValueAnimator dragTensionUpAnimator;
+    private ValueAnimator mDragUpAnimator;
+    private ValueAnimator mAutoRefreshAnimator;
+    private ValueAnimator mDragTensionUpAnimator;
 
     private RefreshCallback mRefreshCallback;
     private OnChildTouchListener mOnChildTouchListener;
@@ -294,16 +297,20 @@ public class PullToRefreshLayout extends FrameLayout {
                 if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0);
                 } else {
-                    dragView(minValue);
+                    calculateOffsetAndDragView(minValue);
                 }
                 break;
         }
         return true;
     }
 
-    private void dragView(final float shiftOffset) {
+    private void calculateOffsetAndDragView(final float shiftOffset) {
         final float delta = mMaxYValue - mIncreasedTensionYValue;
         final float offset = 1f - ((delta - shiftOffset) / (mThreshold * mDragCoefficient));
+        dragView(offset, shiftOffset);
+    }
+
+    private void dragView(final float offset, final float shiftOffset) {
         final float dragOffset = mThreshold * offset;
         final float dragValue = mThreshold - dragOffset;
 
@@ -314,21 +321,21 @@ public class PullToRefreshLayout extends FrameLayout {
             } else if (mDragMode == DragMode.PARALLAX) {
                 final float parallaxOffset = (mThreshold * mParallaxCoefficient);
                 final float originParallaxShift = mThreshold - parallaxOffset;
-                Log.d("PARALLAX", parallaxOffset + " " + originParallaxShift);
                 mFirstChild.setTranslationY(-originParallaxShift * (1 - offset));
             }
-        } else {
+        } else if (shiftOffset >= 0f) {
             final float tensionDelta = 1 - ((mMaxYValue - shiftOffset) / mIncreasedTensionYValue);
             final float tensionOffset = tensionDelta * mTension;
             mSecondChild.setTranslationY(mThreshold + tensionOffset);
 
             if (mDragMode == DragMode.DRAG) {
                 if (mTensionMode == TensionMode.BOTTOM) {
-                    if (mFirstChild.getTranslationY() != 0f)
-                        mFirstChild.setTranslationY(0f);
+                    setFirstChildDefaultState();
                 } else if (mTensionMode == TensionMode.TOP) {
                     mFirstChild.setTranslationY(tensionOffset);
                 }
+            } else if (mDragMode == DragMode.PARALLAX) {
+                setFirstChildDefaultState();
             }
         }
 
@@ -345,10 +352,10 @@ public class PullToRefreshLayout extends FrameLayout {
     }
 
     private void dragUpView(final float from) {
-        dragUpAnimator = new ValueAnimator();
-        dragUpAnimator.setFloatValues(from, 0f);
-        dragUpAnimator.setDuration(getTag() != null ? mFullBackDuration : mCancelBackDuration);
-        dragUpAnimator.addListener(new Animator.AnimatorListener() {
+        mDragUpAnimator = new ValueAnimator();
+        mDragUpAnimator.setFloatValues(from, 0f);
+        mDragUpAnimator.setDuration(getTag() != null ? mFullBackDuration : mCancelBackDuration);
+        mDragUpAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
                 if (mRefreshCallback != null) {
@@ -375,22 +382,22 @@ public class PullToRefreshLayout extends FrameLayout {
             }
         });
 
-        dragUpAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        mDragUpAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 onBackDrag(valueAnimator);
             }
         });
-        dragUpAnimator.start();
+        mDragUpAnimator.start();
     }
 
     private void dragUpWithTension(final float from) {
-        dragTensionUpAnimator = new ValueAnimator();
-        dragTensionUpAnimator.setDuration(mTensionBackDuration);
-        dragTensionUpAnimator.setFloatValues(from, mThreshold);
+        mDragTensionUpAnimator = new ValueAnimator();
+        mDragTensionUpAnimator.setDuration(mTensionBackDuration);
+        mDragTensionUpAnimator.setFloatValues(from, mThreshold);
 
-        setTag(dragTensionUpAnimator);
-        dragTensionUpAnimator.addListener(new Animator.AnimatorListener() {
+        setTag(mDragTensionUpAnimator);
+        mDragTensionUpAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
             }
@@ -412,25 +419,56 @@ public class PullToRefreshLayout extends FrameLayout {
             }
         });
 
-        dragTensionUpAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        mDragTensionUpAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 onBackTension(valueAnimator);
             }
         });
-        dragTensionUpAnimator.start();
+        mDragTensionUpAnimator.start();
+    }
+
+    public void callAutoRefresh() {
+        if (getTag() != null || mIsChildTouched) return;
+        mAutoRefreshAnimator = new ValueAnimator();
+        setTag(mAutoRefreshAnimator);
+        mAutoRefreshAnimator.setFloatValues(0f, mThreshold);
+        mAutoRefreshAnimator.setDuration(mAutoRefreshDuration);
+        mAutoRefreshAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                onRefresh();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+
+        mAutoRefreshAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                dragView(valueAnimator.getAnimatedFraction(), -1f);
+            }
+        });
+        mAutoRefreshAnimator.start();
+
     }
 
     private void onBackDrag(final ValueAnimator valueAnimator) {
-        final float delta = (float) valueAnimator.getAnimatedValue();
         final float fraction = valueAnimator.getAnimatedFraction();
-        mSecondChild.setTranslationY(delta);
-        if (mDragMode == DragMode.DRAG) {
-            mFirstChild.setTranslationY(delta - mFirstChildHeight);
-        }
-        if (mRefreshCallback != null) {
-            mRefreshCallback.onBackDrag(fraction);
-        }
+        dragView(1 - fraction, -1f);
     }
 
     private void onBackTension(final ValueAnimator valueAnimator) {
@@ -455,8 +493,15 @@ public class PullToRefreshLayout extends FrameLayout {
         dragUpView(mThreshold);
     }
 
+    private void setFirstChildDefaultState() {
+        if (mFirstChild.getTranslationY() != 0f) {
+            mFirstChild.setTranslationY(0f);
+        }
+    }
+
     private void reset() {
         mIsRefreshing = false;
+        mIsChildTouched = false;
         mOverScrollDelta = 0f;
         mStartYValue = 0f;
         mMaxYValue = 0f;
@@ -529,16 +574,20 @@ public class PullToRefreshLayout extends FrameLayout {
         mTotalHeight = mThreshold + mTension;
     }
 
-    public void setFullBackDuration(int fullBackDuration) {
+    public void setFullBackDuration(final int fullBackDuration) {
         this.mFullBackDuration = fullBackDuration;
     }
 
-    public void setCancelBackDuration(int cancelBackDuration) {
+    public void setCancelBackDuration(final int cancelBackDuration) {
         this.mCancelBackDuration = cancelBackDuration;
     }
 
-    public void setTensionBackDuration(int tensionBackDuration) {
+    public void setTensionBackDuration(final int tensionBackDuration) {
         this.mTensionBackDuration = tensionBackDuration;
+    }
+
+    public void setAutoRefreshDuration(final int autoRefreshDuration) {
+        this.mAutoRefreshDuration = autoRefreshDuration;
     }
 
     public boolean isRefreshing() {
@@ -550,6 +599,7 @@ public class PullToRefreshLayout extends FrameLayout {
         setFullBackDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_fullBackDuration, 300));
         setCancelBackDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_cancelBackDuration, 200));
         setTensionBackDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_cancelBackDuration, 200));
+        setAutoRefreshDuration(a.getInteger(R.styleable.PullToRefreshLayout_ptr_autoRefreshDuration, 400));
         setThreshold(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_ptr_threshold, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_threshold)));
         setTension(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_ptr_tension, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_tension)));
         setDragCoefficient(a.getFloat(R.styleable.PullToRefreshLayout_ptr_drag_coefficient, 1.0f));
@@ -567,6 +617,7 @@ public class PullToRefreshLayout extends FrameLayout {
         mIncreasedTensionYValue = (mTension * mTensionCoefficient);
         mMaxYValue = mStartYValue + mIncreasedThresholdYValue + mIncreasedTensionYValue;
         mOverScrollDelta = 0f;
+        mIsChildTouched = true;
     }
 
     private int getTopPosition(final View view) {
@@ -577,33 +628,33 @@ public class PullToRefreshLayout extends FrameLayout {
 
     private void tryToFinishBackAnimators() {
         if (mSecondChildTopPosition > 0) {
-            if (dragUpAnimator != null && dragUpAnimator.isRunning()) {
-                dragUpAnimator.cancel();
+            if (mDragUpAnimator != null && mDragUpAnimator.isRunning()) {
+                mDragUpAnimator.cancel();
             }
-            if (dragTensionUpAnimator != null && dragTensionUpAnimator.isRunning()) {
-                dragTensionUpAnimator.cancel();
+            if (mDragTensionUpAnimator != null && mDragTensionUpAnimator.isRunning()) {
+                mDragTensionUpAnimator.cancel();
             }
         }
     }
 
 
-    public void setRefreshCallback(RefreshCallback refreshCallback) {
+    public void setRefreshCallback(final RefreshCallback refreshCallback) {
         mRefreshCallback = refreshCallback;
     }
 
-    public void setOnChildTouchListener(OnChildTouchListener onChildTouchListener) {
+    public void setOnChildTouchListener(final OnChildTouchListener onChildTouchListener) {
         mOnChildTouchListener = onChildTouchListener;
     }
 
-    public void setOnListViewScrollListener(OnListViewScrollListener onListViewScrollListener) {
+    public void setOnListViewScrollListener(final OnListViewScrollListener onListViewScrollListener) {
         mOnListViewScrollListener = onListViewScrollListener;
     }
 
-    public void setOnPullToRefreshTouchEvent(OnPullToRefreshTouchEvent onPullToRefreshTouchEvent) {
+    public void setOnPullToRefreshTouchEvent(final OnPullToRefreshTouchEvent onPullToRefreshTouchEvent) {
         mOnPullToRefreshTouchEvent = onPullToRefreshTouchEvent;
     }
 
-    public void setOnNestedScrollViewScrollListener(OnNestedScrollViewScrollListener onNestedScrollViewScrollListener) {
+    public void setOnNestedScrollViewScrollListener(final OnNestedScrollViewScrollListener onNestedScrollViewScrollListener) {
         mOnNestedScrollViewScrollListener = onNestedScrollViewScrollListener;
     }
 
