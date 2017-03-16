@@ -53,6 +53,7 @@ public class PullToRefreshLayout extends FrameLayout {
     private float mDragCoefficient;
     private float mOverScrollDelta;
     private float mTensionCoefficient;
+    private float mParallaxCoefficient;
     private float mIncreasedTensionYValue;
     private float mIncreasedThresholdYValue;
 
@@ -308,8 +309,14 @@ public class PullToRefreshLayout extends FrameLayout {
 
         if (dragValue > 0f) {
             mSecondChild.setTranslationY(dragOffset);
-            if (mDragMode == DragMode.DRAG)
+            if (mDragMode == DragMode.DRAG) {
                 mFirstChild.setTranslationY(-dragValue);
+            } else if (mDragMode == DragMode.PARALLAX) {
+                final float parallaxOffset = (mThreshold * mParallaxCoefficient);
+                final float originParallaxShift = mThreshold - parallaxOffset;
+                Log.d("PARALLAX", parallaxOffset + " " + originParallaxShift);
+                mFirstChild.setTranslationY(-originParallaxShift * (1 - offset));
+            }
         } else {
             final float tensionDelta = 1 - ((mMaxYValue - shiftOffset) / mIncreasedTensionYValue);
             final float tensionOffset = tensionDelta * mTension;
@@ -469,7 +476,6 @@ public class PullToRefreshLayout extends FrameLayout {
         calculateTotalHeight();
     }
 
-
     public void setDragMode(final DragMode dragMode) {
         mDragMode = dragMode;
         setupLayoutByMode(dragMode);
@@ -487,6 +493,15 @@ public class PullToRefreshLayout extends FrameLayout {
         mTensionCoefficient = tensionCoefficient < 1 ? 1 : tensionCoefficient;
     }
 
+    public void setParallaxCoefficient(final float parallaxCoefficient) {
+        if (parallaxCoefficient < 0f || parallaxCoefficient > 1f) {
+            mParallaxCoefficient = 0.5f;
+        } else {
+            mParallaxCoefficient = parallaxCoefficient;
+        }
+        setupLayoutByMode(mDragMode);
+    }
+
     public void setupLayoutByMode(final DragMode dragMode) {
         if (mFirstChild == null) return;
         final LayoutParams firstChildLayoutParams = (LayoutParams) mFirstChild.getLayoutParams();
@@ -500,7 +515,11 @@ public class PullToRefreshLayout extends FrameLayout {
                 mFirstChild.setTranslationY(-mFirstChildHeight);
                 break;
             case PARALLAX:
-                mFirstChild.setTranslationY(-mFirstChildHeight);
+                if (mParallaxCoefficient == 0f) {
+                    mParallaxCoefficient = 0.5f;
+                }
+                final float parallaxShift = -mFirstChildHeight * mParallaxCoefficient;
+                mFirstChild.setTranslationY(parallaxShift);
                 break;
         }
         mFirstChild.requestLayout();
@@ -535,6 +554,7 @@ public class PullToRefreshLayout extends FrameLayout {
         setTension(a.getDimensionPixelSize(R.styleable.PullToRefreshLayout_ptr_tension, getResources().getDimensionPixelOffset(R.dimen.pull_to_refresh_tension)));
         setDragCoefficient(a.getFloat(R.styleable.PullToRefreshLayout_ptr_drag_coefficient, 1.0f));
         setTensionCoefficient(a.getFloat(R.styleable.PullToRefreshLayout_ptr_tension_coefficient, 3.0f));
+        setParallaxCoefficient(a.getFloat(R.styleable.PullToRefreshLayout_ptr_parallax_coefficient, 0.5f));
         setDragMode(DragMode.values()[a.getInt(R.styleable.PullToRefreshLayout_ptr_drag_mode, 0)]);
         setTensionMode(TensionMode.values()[a.getInt(R.styleable.PullToRefreshLayout_ptr_tension_mode, 0)]);
         requestLayout();

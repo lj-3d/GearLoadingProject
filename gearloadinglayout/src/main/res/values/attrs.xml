@@ -45,6 +45,7 @@
         <attr name="ptr_tension" format="dimension"/>
         <attr name="ptr_drag_coefficient" format="float"/>
         <attr name="ptr_tension_coefficient" format="float"/>
+        <attr name="ptr_parallax_coefficient" format="float"/>
         <attr name="ptr_drag_mode" format="enum">
             <enum name="overlay" value="0"/>
             <enum name="drag" value="1"/>
