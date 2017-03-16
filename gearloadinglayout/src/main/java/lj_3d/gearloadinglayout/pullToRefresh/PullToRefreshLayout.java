@@ -95,8 +95,9 @@ public class PullToRefreshLayout extends FrameLayout {
                 mSecondChild = getChildAt(1);
 
                 findScrollableView(mSecondChild);
-                if (mViewScrollableViewToFind == null)
+                if (mViewScrollableViewToFind == null) {
                     mViewScrollableViewToFind = mSecondChild;
+                }
                 prepareCallbacksForScrollableView(mViewScrollableViewToFind);
 
                 mFirstChild.setEnabled(false);
@@ -108,15 +109,17 @@ public class PullToRefreshLayout extends FrameLayout {
                 mViewScrollableViewToFind.setOnTouchListener(new OnTouchListener() {
                     @Override
                     public boolean onTouch(View view, MotionEvent event) {
-                        if (mOnChildTouchListener != null)
+                        if (mOnChildTouchListener != null) {
                             mOnChildTouchListener.onTouch(view, event);
+                        }
 
                         final float yAxis = event.getRawY();
                         final int eventAction = event.getAction();
 
                         if (mIsRefreshing || getTag() != null) {
-                            if (eventAction == MotionEvent.ACTION_DOWN)
+                            if (eventAction == MotionEvent.ACTION_DOWN) {
                                 mRestoreYValue = yAxis;
+                            }
                             return true; // control for blocking content
                         }
                         switch (eventAction) {
@@ -168,8 +171,9 @@ public class PullToRefreshLayout extends FrameLayout {
             mViewScrollableViewToFind = secondChild;
         } else if (mViewScrollableViewToFind == null && secondChild instanceof ViewGroup && ((ViewGroup) secondChild).getChildCount() > 0) {
             for (int i = 0; i < ((ViewGroup) secondChild).getChildCount(); i++) {
-                if (mViewScrollableViewToFind == null)
+                if (mViewScrollableViewToFind == null) {
                     findScrollableView(((ViewGroup) secondChild).getChildAt(i));
+                }
             }
         }
     }
@@ -187,15 +191,16 @@ public class PullToRefreshLayout extends FrameLayout {
             ((AbsListView) scrollableView).setOnScrollListener(new AbsListView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(final AbsListView listView, final int scrollState) {
-                    if (mOnListViewScrollListener != null)
+                    if (mOnListViewScrollListener != null) {
                         mOnListViewScrollListener.onScrollStateChanged(listView, scrollState);
+                    }
                 }
 
                 @Override
                 public void onScroll(final AbsListView listView, final int firstVisibleItem, final int visibleItemCount, final int totalItemCount) {
-                    if (mOnListViewScrollListener != null)
+                    if (mOnListViewScrollListener != null) {
                         mOnListViewScrollListener.onScroll(listView, firstVisibleItem, visibleItemCount, totalItemCount);
-
+                    }
                     if (firstVisibleItem == 0 && listView != null && listView.getChildAt(0) != null) {
                         final int topPosition = listView.getChildAt(0).getTop();
                         mInnerScrollEnabled = Math.abs(topPosition) != 0;
@@ -222,8 +227,9 @@ public class PullToRefreshLayout extends FrameLayout {
             ((NestedScrollView) scrollableView).setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
                 @Override
                 public void onScrollChange(final NestedScrollView nestedScrollView, final int scrollX, final int scrollY, final int oldScrollX, final int oldScrollY) {
-                    if (mOnNestedScrollViewScrollListener != null)
+                    if (mOnNestedScrollViewScrollListener != null) {
                         mOnNestedScrollViewScrollListener.onScrollChange(nestedScrollView, scrollX, scrollY, oldScrollX, oldScrollY);
+                    }
                     mInnerScrollEnabled = scrollY != 0f;
                     Log.d("onScrollChange", scrollY + " " + oldScrollY);
                 }
@@ -242,14 +248,14 @@ public class PullToRefreshLayout extends FrameLayout {
 
     @Override
     public boolean onTouchEvent(final MotionEvent event) {
-        if (mOnPullToRefreshTouchEvent != null)
+        if (mOnPullToRefreshTouchEvent != null) {
             mOnPullToRefreshTouchEvent.onTouchEvent(event);
+        }
 
         final int eventAction = event.getAction();
-
-        if (eventAction == MotionEvent.ACTION_POINTER_2_DOWN || eventAction == MotionEvent.ACTION_POINTER_INDEX_MASK)
+        if (eventAction == MotionEvent.ACTION_POINTER_2_DOWN || eventAction == MotionEvent.ACTION_POINTER_INDEX_MASK) {
             mSecondChild.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP, 0, event.getRawY(), 0, 0, 0, 0, 0, 0, 0));
-
+        }
         if (mFirstChild == null || mSecondChild == null || mIsRefreshing || getTag() != null) {
             return super.onTouchEvent(event);
         }
@@ -259,12 +265,7 @@ public class PullToRefreshLayout extends FrameLayout {
 
         switch (eventAction) {
             case MotionEvent.ACTION_DOWN:
-                if (mSecondChildTopPosition > 0) {
-                    if (dragUpAnimator != null && dragUpAnimator.isRunning())
-                        dragUpAnimator.cancel();
-                    if (dragTensionUpAnimator != null && dragTensionUpAnimator.isRunning())
-                        dragTensionUpAnimator.cancel();
-                }
+                tryToFinishBackAnimators();
                 onActionDown(yAxis);
                 break;
             case MotionEvent.ACTION_UP:
@@ -288,12 +289,7 @@ public class PullToRefreshLayout extends FrameLayout {
                 mOverScrollDelta = 0f;
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (mSecondChildTopPosition > 0) {
-                    if (dragUpAnimator != null && dragUpAnimator.isRunning())
-                        dragUpAnimator.cancel();
-                    if (dragTensionUpAnimator != null && dragTensionUpAnimator.isRunning())
-                        dragTensionUpAnimator.cancel();
-                }
+                tryToFinishBackAnimators();
                 if (mStartYValue > yAxis) {
                     mSecondChild.setTranslationY(0);
                 } else {
@@ -312,7 +308,6 @@ public class PullToRefreshLayout extends FrameLayout {
 
         if (dragValue > 0f) {
             mSecondChild.setTranslationY(dragOffset);
-
             if (mDragMode == DragMode.DRAG)
                 mFirstChild.setTranslationY(-dragValue);
         } else {
@@ -349,14 +344,16 @@ public class PullToRefreshLayout extends FrameLayout {
         dragUpAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
-                if (mRefreshCallback != null)
+                if (mRefreshCallback != null) {
                     mRefreshCallback.onStartClose();
+                }
             }
 
             @Override
             public void onAnimationEnd(Animator animator) {
-                if (mRefreshCallback != null)
+                if (mRefreshCallback != null) {
                     mRefreshCallback.onFinishClose();
+                }
                 reset();
             }
 
@@ -393,8 +390,9 @@ public class PullToRefreshLayout extends FrameLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (mRefreshCallback != null)
+                if (mRefreshCallback != null) {
                     mRefreshCallback.onTensionComplete();
+                }
                 onRefresh();
             }
 
@@ -423,8 +421,9 @@ public class PullToRefreshLayout extends FrameLayout {
         if (mDragMode == DragMode.DRAG) {
             mFirstChild.setTranslationY(delta - mFirstChildHeight);
         }
-        if (mRefreshCallback != null)
+        if (mRefreshCallback != null) {
             mRefreshCallback.onBackDrag(fraction);
+        }
     }
 
     private void onBackTension(final ValueAnimator valueAnimator) {
@@ -558,10 +557,12 @@ public class PullToRefreshLayout extends FrameLayout {
 
     private void tryToFinishBackAnimators() {
         if (mSecondChildTopPosition > 0) {
-            if (dragUpAnimator != null && dragUpAnimator.isRunning())
+            if (dragUpAnimator != null && dragUpAnimator.isRunning()) {
                 dragUpAnimator.cancel();
-            if (dragTensionUpAnimator != null && dragTensionUpAnimator.isRunning())
+            }
+            if (dragTensionUpAnimator != null && dragTensionUpAnimator.isRunning()) {
                 dragTensionUpAnimator.cancel();
+            }
         }
     }
 
